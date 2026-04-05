@@ -1,0 +1,4 @@
+{"type":"server-started","port":63731,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:63731","screen_dir":"/Users/youssef/WebstormProjects/price-track/.superpowers/brainstorm/46305-1775332275/content","state_dir":"/Users/youssef/WebstormProjects/price-track/.superpowers/brainstorm/46305-1775332275/state"}
+{"type":"screen-added","file":"/Users/youssef/WebstormProjects/price-track/.superpowers/brainstorm/46305-1775332275/content/app-screens.html"}
+{"type":"screen-added","file":"/Users/youssef/WebstormProjects/price-track/.superpowers/brainstorm/46305-1775332275/content/waiting.html"}
+{"type":"server-stopped","reason":"idle timeout"}

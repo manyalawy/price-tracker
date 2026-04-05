@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const checkPricesRouter = require('./routes/check-prices');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -66,6 +67,9 @@ app.post('/extract', async (req, res) => {
     return res.status(500).json({ error: 'Failed to extract product data.' });
   }
 });
+
+// Check prices route
+app.use(checkPricesRouter);
 
 // Start server
 app.listen(PORT, () => {

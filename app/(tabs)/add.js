@@ -1,0 +1,161 @@
+import { useState } from 'react';
+import { View, Text, ScrollView, StyleSheet, Keyboard, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import Input from '../../components/ui/Input';
+import Button from '../../components/ui/Button';
+import ProductPreview from '../../components/ProductPreview';
+import { extractProduct } from '../../lib/api';
+import { useProducts } from '../../contexts/ProductsContext';
+import { colors, spacing, typography } from '../../constants/theme';
+
+export default function AddScreen() {
+  const router = useRouter();
+  const { addProduct } = useProducts();
+  const [url, setUrl] = useState('');
+  const [targetPrice, setTargetPrice] = useState('');
+  const [extracting, setExtracting] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [product, setProduct] = useState(null);
+  const [error, setError] = useState('');
+
+  const handleExtract = async () => {
+    if (!url.trim()) {
+      setError('Please enter a product URL');
+      return;
+    }
+    Keyboard.dismiss();
+    setExtracting(true);
+    setError('');
+    setProduct(null);
+
+    try {
+      const result = await extractProduct(url.trim());
+      if (result.error || result.placeholder) {
+        setError(result.error || result.message || 'Could not extract product data');
+      } else {
+        setProduct(result);
+      }
+    } catch (e) {
+      setError(e.message || 'Failed to extract product data');
+    } finally {
+      setExtracting(false);
+    }
+  };
+
+  const handleTrack = async () => {
+    const target = parseFloat(targetPrice);
+    if (!target || target <= 0) {
+      setError('Please enter a valid target price');
+      return;
+    }
+    setSaving(true);
+    setError('');
+
+    try {
+      await addProduct({
+        url: url.trim(),
+        name: product.name,
+        image_url: product.image_url,
+        domain: product.domain,
+        price: product.price,
+        currency: product.currency,
+        target_price: target,
+        method: product.method,
+        selector: product.selector,
+      });
+      Alert.alert('Success', 'Product is now being tracked!', [
+        { text: 'OK', onPress: () => {
+          setUrl('');
+          setTargetPrice('');
+          setProduct(null);
+          router.push('/(tabs)');
+        }},
+      ]);
+    } catch (e) {
+      setError(e.message || 'Failed to save product');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView style={styles.content} keyboardShouldPersistTaps="handled">
+        <Text style={styles.title}>Add Product</Text>
+        <Text style={styles.subtitle}>Paste a product URL to start tracking</Text>
+
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+
+        <Input
+          label="Product URL"
+          value={url}
+          onChangeText={setUrl}
+          placeholder="https://www.amazon.com/..."
+          autoCapitalize="none"
+          keyboardType="url"
+        />
+
+        <Button
+          title={extracting ? 'Extracting...' : 'Fetch Product'}
+          onPress={handleExtract}
+          loading={extracting}
+          disabled={!url.trim()}
+          style={styles.button}
+        />
+
+        {product && (
+          <>
+            <ProductPreview product={product} />
+
+            <Input
+              label="Target Price"
+              value={targetPrice}
+              onChangeText={setTargetPrice}
+              placeholder="Enter your target price"
+              keyboardType="decimal-pad"
+            />
+
+            <Button
+              title="Start Tracking"
+              onPress={handleTrack}
+              loading={saving}
+              disabled={!targetPrice}
+            />
+          </>
+        )}
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: spacing.md,
+  },
+  title: {
+    color: colors.text,
+    fontSize: typography.sizes.xxl,
+    fontWeight: typography.weights.bold,
+    marginTop: spacing.md,
+  },
+  subtitle: {
+    color: colors.textSecondary,
+    fontSize: typography.sizes.md,
+    marginBottom: spacing.lg,
+    marginTop: spacing.xs,
+  },
+  error: {
+    color: colors.danger,
+    fontSize: typography.sizes.sm,
+    marginBottom: spacing.md,
+  },
+  button: {
+    marginBottom: spacing.lg,
+  },
+});

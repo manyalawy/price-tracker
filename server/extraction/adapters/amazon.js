@@ -1,14 +1,20 @@
 const cheerio = require('cheerio');
 const { parsePrice, detectCurrency } = require('../utils/price');
 
+// Ordered to prefer discounted/sale price over original/list price
 const PRICE_SELECTORS = [
-  '.a-price .a-offscreen',
-  '#priceblock_ourprice',
+  '.priceToPay .a-offscreen',
   '#priceblock_dealprice',
   '#priceblock_saleprice',
-  '.a-price-whole',
+  '#corePrice_feature_div .a-price:not([data-a-color="secondary"]) .a-offscreen',
+  '.a-price[data-a-size="xl"] .a-offscreen',
+  '.a-price[data-a-size="l"] .a-offscreen',
+  '#apex_offerDisplay_desktop .a-price .a-offscreen',
+  '#priceblock_ourprice',
   '#price_inside_buybox',
   '#newBuyBoxPrice',
+  '.a-price .a-offscreen',
+  '.a-price-whole',
   'span.a-color-price',
 ];
 
@@ -60,4 +66,4 @@ function extract(html, url) {
   };
 }
 
-module.exports = { extract, domains: ['amazon.com', 'amazon.co.uk', 'amazon.ca', 'amazon.de', 'amazon.fr', 'amazon.it', 'amazon.es', 'amazon.co.jp', 'amazon.in', 'amazon.com.au', 'amazon.com.br'] };
+module.exports = { extract, domains: ['amazon.com', 'amazon.co.uk', 'amazon.ca', 'amazon.de', 'amazon.fr', 'amazon.it', 'amazon.es', 'amazon.co.jp', 'amazon.in', 'amazon.com.au', 'amazon.com.br', 'amazon.eg', 'amazon.sa', 'amazon.ae'] };

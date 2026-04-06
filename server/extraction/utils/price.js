@@ -15,6 +15,7 @@ const CURRENCY_PATTERNS = [
   { symbol: 'Kč', code: 'CZK', regex: /Kč|CZK/ },
   { symbol: '₺', code: 'TRY', regex: /₺|TRY/ },
   { symbol: 'د.إ', code: 'AED', regex: /د\.إ|AED/ },
+  { symbol: 'ج.م', code: 'EGP', regex: /ج\.م|EGP|EGP£/ },
 ];
 
 /**

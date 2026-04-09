@@ -47,7 +47,7 @@ app.post('/extract', async (req, res) => {
 app.use(checkPricesRouter)
 
 app.listen(config.port, () => {
-  console.error(`price-track-server running on port ${config.port}`)
+  console.log(`price-track-server running on port ${config.port}`) // eslint-disable-line no-console
 })
 
 module.exports = app

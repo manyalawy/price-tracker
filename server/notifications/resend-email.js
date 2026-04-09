@@ -1,4 +1,5 @@
-const https = require('https');
+const https = require('https')
+const { resendKey: apiKey } = require('../lib/config')
 
 /**
  * Send a price drop email via Resend API.
@@ -11,12 +12,6 @@ const https = require('https');
  * @param {string} params.productUrl - Original product URL
  */
 async function sendPriceDropEmail({ to, productName, currentPrice, targetPrice, currency, productUrl }) {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    console.warn('[resend] No RESEND_API_KEY set, skipping email');
-    return null;
-  }
-
   const symbol = currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : '$';
 
   const htmlBody = `

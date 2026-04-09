@@ -1,13 +1,12 @@
-require('dotenv').config();
-
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const checkPricesRouter = require('./routes/check-prices');
+const config = require('./lib/config');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = config.port;
 
 // Security middleware
 app.use(helmet());
@@ -27,7 +26,7 @@ app.use(limiter);
 // API key auth middleware
 function requireApiKey(req, res, next) {
   const apiKey = req.headers['x-api-key'];
-  if (!apiKey || apiKey !== process.env.API_KEY) {
+  if (!apiKey || apiKey !== config.apiKey) {
     return res.status(401).json({ error: 'Unauthorized: invalid or missing API key.' });
   }
   next();

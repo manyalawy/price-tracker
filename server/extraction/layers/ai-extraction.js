@@ -15,12 +15,6 @@ function getClient() {
  * Sends cleaned, truncated HTML and asks for structured extraction.
  */
 async function extract(html, url) {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    console.warn('[ai-extraction] No ANTHROPIC_API_KEY set, skipping AI extraction');
-    return null;
-  }
-
   const cleaned = cleanHtml(html);
   const truncated = truncateHtml(cleaned, 12000);
 

@@ -1,4 +1,3 @@
-const cheerio = require('cheerio');
 const { parsePrice, detectCurrency } = require('../utils/price');
 
 // Common price CSS patterns found across e-commerce sites
@@ -44,9 +43,7 @@ const COMMON_NAME_SELECTORS = [
  * Extract product price using CSS heuristics.
  * Optionally tries a cached selector first.
  */
-function extract(html, url, cachedSelector) {
-  const $ = cheerio.load(html);
-
+function extract($, url, cachedSelector) {
   // Try cached selector first
   if (cachedSelector) {
     const text = $(cachedSelector).first().text().trim();

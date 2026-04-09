@@ -1,4 +1,3 @@
-const cheerio = require('cheerio')
 const { extractFirstMatch, parsePriceWithCurrency, isValidPrice } = require('../utils/adapter-helpers')
 
 const PRICE_SELECTORS = [
@@ -21,9 +20,7 @@ const NAME_SELECTORS = ['#productTitle', '#title', 'h1.product-title-word-break'
 
 const IMAGE_SELECTORS = ['#landingImage', '#imgBlkFront', '#main-image', '.a-dynamic-image']
 
-function extract(html, url) {
-  const $ = cheerio.load(html)
-
+function extract($, url) {
   const nameMatch = extractFirstMatch($, NAME_SELECTORS)
   const name = nameMatch ? nameMatch.text : 'Amazon Product'
 

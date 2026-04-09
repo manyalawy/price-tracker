@@ -1,4 +1,3 @@
-const cheerio = require('cheerio')
 const { parsePriceWithCurrency, isValidPrice } = require('../utils/adapter-helpers')
 
 const PRICE_SELECTORS = [
@@ -8,9 +7,7 @@ const PRICE_SELECTORS = [
   '[itemprop="price"]',
 ]
 
-function extract(html, url) {
-  const $ = cheerio.load(html)
-
+function extract($, url) {
   let priceText = null
   let selector = null
 

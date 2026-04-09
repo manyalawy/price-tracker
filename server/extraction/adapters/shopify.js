@@ -1,11 +1,8 @@
-const cheerio = require('cheerio')
 const { extractJsonLd, parsePriceWithCurrency, isValidPrice } = require('../utils/adapter-helpers')
 const { fetchPage } = require('../utils/html')
 const { parsePrice } = require('../utils/price')
 
-async function extract(html, url) {
-  const $ = cheerio.load(html)
-
+async function extract($, url, html) {
   const isShopify =
     html.includes('Shopify.theme') ||
     html.includes('cdn.shopify.com') ||

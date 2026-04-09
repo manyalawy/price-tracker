@@ -1,11 +1,8 @@
-const cheerio = require('cheerio')
 const { parsePriceWithCurrency, isValidPrice } = require('../utils/adapter-helpers')
 const { fetchPage } = require('../utils/html')
 const { parsePrice } = require('../utils/price')
 
-async function extract(html, url) {
-  const $ = cheerio.load(html)
-
+async function extract($, url) {
   const tcinMatch = url.match(/A-(\d+)/) || url.match(/\/(\d{8,})(?:\?|$|#)/)
   const tcin = tcinMatch ? tcinMatch[1] : null
 

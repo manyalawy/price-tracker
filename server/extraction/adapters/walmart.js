@@ -1,9 +1,6 @@
-const cheerio = require('cheerio')
 const { extractJsonLd, parsePriceWithCurrency, isValidPrice } = require('../utils/adapter-helpers')
 
-function extract(html, url) {
-  const $ = cheerio.load(html)
-
+function extract($, url) {
   const jsonLdResult = extractJsonLd($, 'Walmart Product')
   if (jsonLdResult) return jsonLdResult
 

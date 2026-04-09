@@ -1,4 +1,3 @@
-const cheerio = require('cheerio')
 const { extractFirstMatch, parsePriceWithCurrency, isValidPrice } = require('../utils/adapter-helpers')
 const { parsePrice } = require('../utils/price')
 
@@ -13,9 +12,7 @@ const PRICE_SELECTORS = [
 
 const BID_SELECTORS = ['#prcIsum_bid498', '.vi-VR-cvipPrice', '#bidPrice']
 
-function extract(html, url) {
-  const $ = cheerio.load(html)
-
+function extract($, url) {
   const validatePrice = (text) => parsePrice(text) !== null
 
   const priceMatch =

@@ -1,4 +1,3 @@
-const cheerio = require('cheerio');
 const { parsePrice, detectCurrency } = require('../utils/price');
 
 /**
@@ -7,9 +6,7 @@ const { parsePrice, detectCurrency } = require('../utils/price');
  * 2. Open Graph (og:price:amount)
  * 3. Meta itemprop (itemprop="price")
  */
-function extract(html, url) {
-  const $ = cheerio.load(html);
-
+function extract($, url) {
   // 1. JSON-LD
   const result = tryJsonLd($);
   if (result) return result;

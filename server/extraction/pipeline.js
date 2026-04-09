@@ -1,9 +1,10 @@
-const { URL } = require('url');
-const { fetchPage } = require('./utils/html');
-const { getAdapter, shopifyAdapter } = require('./adapters');
-const structuredData = require('./layers/structured-data');
-const cssHeuristics = require('./layers/css-heuristics');
-const aiExtraction = require('./layers/ai-extraction');
+const cheerio = require('cheerio')
+const { URL } = require('url')
+const { fetchPage } = require('./utils/html')
+const { getAdapter, shopifyAdapter } = require('./adapters')
+const structuredData = require('./layers/structured-data')
+const cssHeuristics = require('./layers/css-heuristics')
+const aiExtraction = require('./layers/ai-extraction')
 
 /**
  * Extract product data from a URL using a 4-layer pipeline:
@@ -12,97 +13,91 @@ const aiExtraction = require('./layers/ai-extraction');
  * 3. CSS heuristics (common price patterns)
  * 4. AI extraction (Claude API fallback)
  *
- * @param {string} url - Product URL
- * @param {object} [options]
- * @param {string} [options.cachedSelector] - Previously successful CSS selector
- * @param {string} [options.cachedMethod] - Previously successful method
- * @returns {Promise<object>} Extracted product data
+ * @param {string} url
+ * @param {{ cachedSelector?: string, cachedMethod?: string }} [options]
+ * @returns {Promise<object>}
  */
 async function extractProduct(url, { cachedSelector, cachedMethod } = {}) {
-  const parsedUrl = new URL(url);
-  const domain = parsedUrl.hostname.replace(/^www\./, '');
+  const { hostname } = new URL(url)
+  const domain = hostname.replace(/^www\./, '')
 
-  // Fetch the page HTML
-  const html = await fetchPage(url);
+  const html = await fetchPage(url)
+  const $ = cheerio.load(html) // parse once, reuse across all layers
 
-  // If we have a cached method, try it first
   if (cachedMethod && cachedSelector) {
-    const cached = tryCachedMethod(html, url, cachedMethod, cachedSelector, domain);
-    if (cached) return { ...cached, domain };
+    const cached = tryExtractWithCache($, html, url, cachedMethod, cachedSelector, domain)
+    if (cached) return { ...cached, domain }
   }
 
   // Layer 1: Domain adapter
-  const adapter = getAdapter(domain);
+  const adapter = getAdapter(domain)
   if (adapter) {
     try {
       const result = adapter.isAsync
-        ? await adapter.extract(html, url)
-        : adapter.extract(html, url);
-      if (result) return { ...result, domain };
+        ? await adapter.extract($, url, html)
+        : adapter.extract($, url, html)
+      if (result) return { ...result, domain }
     } catch (err) {
-      console.warn(`[pipeline] Adapter error for ${domain}:`, err.message);
+      console.error(`[pipeline] Adapter error for ${domain}:`, err.message)
     }
   }
 
-  // Try Shopify adapter as a probe for unknown domains
+  // Shopify probe for unknown domains
   if (!adapter) {
     try {
-      const shopifyResult = await shopifyAdapter.extract(html, url);
-      if (shopifyResult) return { ...shopifyResult, domain };
-    } catch (err) {
+      const shopifyResult = await shopifyAdapter.extract($, url, html)
+      if (shopifyResult) return { ...shopifyResult, domain }
+    } catch (_err) {
       // Not a Shopify store, continue
     }
   }
 
   // Layer 2: Structured data
   try {
-    const result = structuredData.extract(html, url);
-    if (result) return { ...result, domain };
+    const result = structuredData.extract($, url)
+    if (result) return { ...result, domain }
   } catch (err) {
-    console.warn('[pipeline] Structured data error:', err.message);
+    console.error('[pipeline] Structured data error:', err.message)
   }
 
   // Layer 3: CSS heuristics
   try {
-    const result = cssHeuristics.extract(html, url, cachedSelector);
-    if (result) return { ...result, domain };
+    const result = cssHeuristics.extract($, url, cachedSelector)
+    if (result) return { ...result, domain }
   } catch (err) {
-    console.warn('[pipeline] CSS heuristics error:', err.message);
+    console.error('[pipeline] CSS heuristics error:', err.message)
   }
 
-  // Layer 4: AI extraction (last resort)
+  // Layer 4: AI extraction (needs raw HTML string)
   try {
-    const result = await aiExtraction.extract(html, url);
-    if (result) return { ...result, domain };
+    const result = await aiExtraction.extract(html, url)
+    if (result) return { ...result, domain }
   } catch (err) {
-    console.warn('[pipeline] AI extraction error:', err.message);
+    console.error('[pipeline] AI extraction error:', err.message)
   }
 
-  throw new Error(`Failed to extract product data from ${url}`);
+  throw new Error(`Failed to extract product data from ${url}`)
 }
 
-function tryCachedMethod(html, url, method, selector, domain) {
+function tryExtractWithCache($, html, url, method, selector, domain) {
   try {
     switch (method) {
       case 'adapter': {
-        const adapter = getAdapter(domain);
-        if (adapter) {
-          return adapter.isAsync ? null : adapter.extract(html, url);
-        }
-        break;
+        const adapter = getAdapter(domain)
+        if (adapter && !adapter.isAsync) return adapter.extract($, url, html)
+        return null
       }
       case 'json_ld':
       case 'meta':
-        return structuredData.extract(html, url);
+        return structuredData.extract($, url)
       case 'css':
-        return cssHeuristics.extract(html, url, selector);
+        return cssHeuristics.extract($, url, selector)
       default:
-        return null;
+        return null
     }
-  } catch (e) {
-    return null;
+  } catch (_e) {
+    return null
   }
-  return null;
 }
 
-module.exports = { extractProduct };
+module.exports = { extractProduct }

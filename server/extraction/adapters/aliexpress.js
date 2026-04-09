@@ -1,4 +1,3 @@
-const cheerio = require('cheerio')
 const { extractFirstMatch, parsePriceWithCurrency, isValidPrice } = require('../utils/adapter-helpers')
 const { parsePrice } = require('../utils/price')
 
@@ -11,9 +10,7 @@ const PRICE_SELECTORS = [
   '.product-price-current',
 ]
 
-function extract(html, url) {
-  const $ = cheerio.load(html)
-
+function extract($, url) {
   const priceMatch = extractFirstMatch($, PRICE_SELECTORS, (text) => parsePrice(text) !== null)
   if (!priceMatch) return null
 

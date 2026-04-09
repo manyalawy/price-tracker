@@ -27,5 +27,8 @@
     "react-native-screens": "~4.16.0",
     "react-native-svg": "15.12.1"
   },
+  "overrides": {
+    "react-dom": "19.1.0"
+  },
   "private": true
 }

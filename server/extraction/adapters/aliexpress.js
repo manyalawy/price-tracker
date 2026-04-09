@@ -1,48 +1,37 @@
-const cheerio = require('cheerio');
-const { parsePrice, detectCurrency } = require('../utils/price');
+const cheerio = require('cheerio')
+const { extractFirstMatch, parsePriceWithCurrency, isValidPrice } = require('../utils/adapter-helpers')
+const { parsePrice } = require('../utils/price')
+
+const PRICE_SELECTORS = [
+  '.product-price-value',
+  '.uniform-banner-box-price',
+  '[class*="Price"] [class*="value"]',
+  '.es--wrap--erdmPRe .es--wrap--erdmPRe',
+  'span[itemprop="price"]',
+  '.product-price-current',
+]
 
 function extract(html, url) {
-  const $ = cheerio.load(html);
+  const $ = cheerio.load(html)
 
-  const PRICE_SELECTORS = [
-    '.product-price-value',
-    '.uniform-banner-box-price',
-    '[class*="Price"] [class*="value"]',
-    '.es--wrap--erdmPRe .es--wrap--erdmPRe',
-    'span[itemprop="price"]',
-    '.product-price-current',
-  ];
+  const priceMatch = extractFirstMatch($, PRICE_SELECTORS, (text) => parsePrice(text) !== null)
+  if (!priceMatch) return null
 
-  let priceText = null;
-  let selector = null;
-  for (const sel of PRICE_SELECTORS) {
-    const el = $(sel).first();
-    const text = el.text().trim() || el.attr('content');
-    if (text && parsePrice(text) !== null) {
-      priceText = text;
-      selector = sel;
-      break;
-    }
-  }
+  const { price, currency } = parsePriceWithCurrency(priceMatch.text)
+  if (!isValidPrice(price)) return null
 
-  const price = parsePrice(priceText);
-  if (price === null) return null;
+  const name =
+    $('h1[data-pl="product-title"]').first().text().trim() ||
+    $('h1').first().text().trim() ||
+    $('meta[property="og:title"]').first().attr('content') ||
+    'AliExpress Product'
 
-  const name = $('h1[data-pl="product-title"]').first().text().trim()
-    || $('h1').first().text().trim()
-    || $('meta[property="og:title"]').first().attr('content');
+  const imageUrl =
+    $('meta[property="og:image"]').first().attr('content') ||
+    $('img.magnifier-image').first().attr('src') ||
+    null
 
-  const imageUrl = $('meta[property="og:image"]').first().attr('content')
-    || $('img.magnifier-image').first().attr('src');
-
-  return {
-    name: name || 'AliExpress Product',
-    price,
-    currency: detectCurrency(priceText) || 'USD',
-    image_url: imageUrl || null,
-    method: 'adapter',
-    selector,
-  };
+  return { name, price, currency: currency || 'USD', image_url: imageUrl, method: 'adapter', selector: priceMatch.selector }
 }
 
-module.exports = { extract, domains: ['aliexpress.com', 'aliexpress.us'] };
+module.exports = { extract, domains: ['aliexpress.com', 'aliexpress.us'] }

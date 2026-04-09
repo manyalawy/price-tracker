@@ -1,71 +1,45 @@
-const cheerio = require('cheerio');
-const { parsePrice, detectCurrency } = require('../utils/price');
+const cheerio = require('cheerio')
+const { extractFirstMatch, parsePriceWithCurrency, isValidPrice } = require('../utils/adapter-helpers')
+const { parsePrice } = require('../utils/price')
+
+const PRICE_SELECTORS = [
+  '.x-price-primary span.ux-textspans',
+  '#prcIsum',
+  '#prcIsum_bid498',
+  '[itemprop="price"]',
+  '.display-price',
+  '#mm-saleDscPrc',
+]
+
+const BID_SELECTORS = ['#prcIsum_bid498', '.vi-VR-cvipPrice', '#bidPrice']
 
 function extract(html, url) {
-  const $ = cheerio.load(html);
+  const $ = cheerio.load(html)
 
-  // Buy-now price selectors
-  const PRICE_SELECTORS = [
-    '.x-price-primary span.ux-textspans',
-    '#prcIsum',
-    '#prcIsum_bid498',
-    '[itemprop="price"]',
-    '.display-price',
-    '#mm-saleDscPrc',
-  ];
+  const validatePrice = (text) => parsePrice(text) !== null
 
-  // Bid price selectors
-  const BID_SELECTORS = [
-    '#prcIsum_bid498',
-    '.vi-VR-cvipPrice',
-    '#bidPrice',
-  ];
+  const priceMatch =
+    extractFirstMatch($, PRICE_SELECTORS, validatePrice) ||
+    extractFirstMatch($, BID_SELECTORS, validatePrice)
 
-  let priceText = null;
-  let selector = null;
+  if (!priceMatch) return null
 
-  // Try buy-now first
-  for (const sel of PRICE_SELECTORS) {
-    const el = $(sel).first();
-    const text = el.text().trim() || el.attr('content');
-    if (text && parsePrice(text) !== null) {
-      priceText = text;
-      selector = sel;
-      break;
-    }
-  }
+  const { price, currency } = parsePriceWithCurrency(priceMatch.text)
+  if (!isValidPrice(price)) return null
 
-  // Try bid price if no buy-now
-  if (!priceText) {
-    for (const sel of BID_SELECTORS) {
-      const text = $(sel).first().text().trim();
-      if (text && parsePrice(text) !== null) {
-        priceText = text;
-        selector = sel;
-        break;
-      }
-    }
-  }
+  const name =
+    $('h1.x-item-title__mainTitle span').first().text().trim() ||
+    $('h1#itemTitle').first().text().replace('Details about', '').trim() ||
+    $('h1').first().text().trim() ||
+    'eBay Item'
 
-  const price = parsePrice(priceText);
-  if (price === null) return null;
+  const imageUrl =
+    $('img.ux-image-carousel-item').first().attr('src') ||
+    $('img#icImg').first().attr('src') ||
+    $('meta[property="og:image"]').first().attr('content') ||
+    null
 
-  const name = $('h1.x-item-title__mainTitle span').first().text().trim()
-    || $('h1#itemTitle').first().text().replace('Details about', '').trim()
-    || $('h1').first().text().trim();
-
-  const imageUrl = $('img.ux-image-carousel-item').first().attr('src')
-    || $('img#icImg').first().attr('src')
-    || $('meta[property="og:image"]').first().attr('content');
-
-  return {
-    name: name || 'eBay Item',
-    price,
-    currency: detectCurrency(priceText),
-    image_url: imageUrl || null,
-    method: 'adapter',
-    selector,
-  };
+  return { name, price, currency, image_url: imageUrl, method: 'adapter', selector: priceMatch.selector }
 }
 
-module.exports = { extract, domains: ['ebay.com', 'ebay.co.uk', 'ebay.de', 'ebay.fr', 'ebay.ca', 'ebay.com.au'] };
+module.exports = { extract, domains: ['ebay.com', 'ebay.co.uk', 'ebay.de', 'ebay.fr', 'ebay.ca', 'ebay.com.au'] }

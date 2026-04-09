@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Stack, useRouter } from 'expo-router';
+import { Redirect, Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
@@ -34,6 +34,7 @@ function RootLayoutNav() {
   return (
     <>
       <StatusBar style="light" />
+      {!session && <Redirect href="/(auth)/login" />}
       <Stack
         screenOptions={{
           headerShown: false,
@@ -41,23 +42,18 @@ function RootLayoutNav() {
           animation: 'fade',
         }}
       >
-        {session ? (
-          <>
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen
-              name="product/[id]"
-              options={{
-                headerShown: true,
-                headerStyle: { backgroundColor: colors.background },
-                headerTintColor: colors.text,
-                headerTitle: 'Product Details',
-                presentation: 'card',
-              }}
-            />
-          </>
-        ) : (
-          <Stack.Screen name="(auth)" />
-        )}
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen
+          name="product/[id]"
+          options={{
+            headerShown: true,
+            headerStyle: { backgroundColor: colors.background },
+            headerTintColor: colors.text,
+            headerTitle: 'Product Details',
+            presentation: 'card',
+          }}
+        />
       </Stack>
     </>
   );

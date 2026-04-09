@@ -55,6 +55,7 @@ export function ProductsProvider({ children }) {
   }, [user]);
 
   const addProduct = async (productData) => {
+    if (!user) throw new Error('You must be signed in to track a product');
     const { data, error } = await supabase
       .from('products')
       .insert({

@@ -1,56 +1,55 @@
-const cheerio = require('cheerio');
-const { parsePrice, detectCurrency } = require('../utils/price');
-const { fetchPage } = require('../utils/html');
+const cheerio = require('cheerio')
+const { extractJsonLd, parsePriceWithCurrency, isValidPrice } = require('../utils/adapter-helpers')
+const { fetchPage } = require('../utils/html')
+const { parsePrice } = require('../utils/price')
 
 async function extract(html, url) {
-  const $ = cheerio.load(html);
+  const $ = cheerio.load(html)
 
-  // Detect Shopify: look for Shopify.theme or shopify meta
-  const isShopify = html.includes('Shopify.theme') ||
+  const isShopify =
+    html.includes('Shopify.theme') ||
     html.includes('cdn.shopify.com') ||
-    $('meta[name="shopify-digital-wallet"]').length > 0;
+    $('meta[name="shopify-digital-wallet"]').length > 0
 
-  // Try JSON-LD first — it has accurate localized price + currency
-  const jsonLdResult = tryJsonLd($);
-  if (jsonLdResult) return jsonLdResult;
+  // 1. JSON-LD — most accurate for price + currency
+  const jsonLdResult = extractJsonLd($)
+  if (jsonLdResult) return { ...jsonLdResult, selector: 'shopify-jsonld' }
 
-  // Try .json product API (no currency info, so also check OG/meta for currency)
+  // 2. Shopify .json API
   try {
-    const productUrl = url.replace(/\?.*$/, '').replace(/\/$/, '') + '.json';
-    const jsonStr = await fetchPage(productUrl, { timeoutMs: 5000 });
-    const data = JSON.parse(jsonStr);
-    const product = data.product;
-    if (product && product.variants && product.variants.length > 0) {
-      const variant = product.variants[0];
-      const price = parsePrice(variant.price);
-      if (price !== null) {
-        // Try to get currency from HTML meta tags since .json API doesn't include it
-        const currency = $('meta[property="og:price:currency"]').attr('content')
-          || $('meta[property="product:price:currency"]').attr('content')
-          || getCurrencyFromScripts(html)
-          || 'USD';
-
+    const productUrl = url.replace(/\?.*$/, '').replace(/\/$/, '') + '.json'
+    const jsonStr = await fetchPage(productUrl, { timeoutMs: 5000 })
+    const data = JSON.parse(jsonStr)
+    const product = data.product
+    if (product?.variants?.length > 0) {
+      const price = parsePrice(product.variants[0].price)
+      if (isValidPrice(price)) {
+        const currency =
+          $('meta[property="og:price:currency"]').attr('content') ||
+          $('meta[property="product:price:currency"]').attr('content') ||
+          getCurrencyFromScripts(html) ||
+          'USD'
         return {
           name: product.title,
           price,
           currency,
-          image_url: product.image?.src || (product.images && product.images[0]?.src) || null,
+          image_url: product.image?.src || product.images?.[0]?.src || null,
           method: 'adapter',
           selector: 'shopify-json',
-        };
+        }
       }
     }
-  } catch (e) {
+  } catch (_e) {
     // .json API not available, fall through
   }
 
-  if (!isShopify) return null;
+  if (!isShopify) return null
 
-  // Fallback: OG meta price
-  const ogPrice = $('meta[property="og:price:amount"]').attr('content');
+  // 3. OG meta price fallback
+  const ogPrice = $('meta[property="og:price:amount"]').attr('content')
   if (ogPrice) {
-    const price = parsePrice(ogPrice);
-    if (price !== null) {
+    const { price } = parsePriceWithCurrency(ogPrice)
+    if (isValidPrice(price)) {
       return {
         name: $('meta[property="og:title"]').attr('content') || null,
         price,
@@ -58,42 +57,16 @@ async function extract(html, url) {
         image_url: $('meta[property="og:image"]').attr('content') || null,
         method: 'adapter',
         selector: 'shopify-og',
-      };
+      }
     }
   }
 
-  return null;
-}
-
-function tryJsonLd($) {
-  const scripts = $('script[type="application/ld+json"]');
-  for (let i = 0; i < scripts.length; i++) {
-    try {
-      const data = JSON.parse($(scripts[i]).html());
-      const product = data['@type'] === 'Product' ? data : null;
-      if (product) {
-        const offers = product.offers;
-        const offer = Array.isArray(offers) ? offers[0] : offers;
-        const price = parsePrice(offer?.price || offer?.lowPrice);
-        if (price !== null) {
-          return {
-            name: product.name,
-            price,
-            currency: offer?.priceCurrency || 'USD',
-            image_url: Array.isArray(product.image) ? product.image[0] : product.image || null,
-            method: 'adapter',
-            selector: 'shopify-jsonld',
-          };
-        }
-      }
-    } catch (e) { /* skip */ }
-  }
-  return null;
+  return null
 }
 
 function getCurrencyFromScripts(html) {
-  const match = html.match(/"currency"\s*:\s*"([A-Z]{3})"/);
-  return match ? match[1] : null;
+  const match = html.match(/"currency"\s*:\s*"([A-Z]{3})"/)
+  return match ? match[1] : null
 }
 
-module.exports = { extract, domains: ['shopify'], isAsync: true };
+module.exports = { extract, domains: ['shopify'], isAsync: true }

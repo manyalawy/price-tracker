@@ -11,8 +11,15 @@ const { resendKey: apiKey } = require('../lib/config')
  * @param {string} params.currency - Currency code
  * @param {string} params.productUrl - Original product URL
  */
-async function sendPriceDropEmail({ to, productName, currentPrice, targetPrice, currency, productUrl }) {
-  const symbol = currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : '$';
+async function sendPriceDropEmail({
+  to,
+  productName,
+  currentPrice,
+  targetPrice,
+  currency,
+  productUrl,
+}) {
+  const symbol = currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : '$'
 
   const htmlBody = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 500px; margin: 0 auto; background: #0a0a0a; color: #ffffff; padding: 32px; border-radius: 12px;">
@@ -26,43 +33,47 @@ async function sendPriceDropEmail({ to, productName, currentPrice, targetPrice, 
       <a href="${productUrl}" style="display: inline-block; background: #4ade80; color: #0a0a0a; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">View Product</a>
       <p style="color: #6b7280; font-size: 12px; margin-top: 24px;">Sent by PriceTrack</p>
     </div>
-  `;
+  `
 
   const body = JSON.stringify({
     from: 'PriceTrack <alerts@pricetrack.app>',
     to: [to],
     subject: `Price Drop: ${productName} is now ${symbol}${currentPrice.toFixed(2)}`,
     html: htmlBody,
-  });
+  })
 
-  return new Promise((resolve, reject) => {
-    const req = https.request('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(body),
+  return new Promise((resolve, _reject) => {
+    const req = https.request(
+      'https://api.resend.com/emails',
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(body),
+        },
       },
-    }, (res) => {
-      const chunks = [];
-      res.on('data', (chunk) => chunks.push(chunk));
-      res.on('end', () => {
-        try {
-          resolve(JSON.parse(Buffer.concat(chunks).toString()));
-        } catch (e) {
-          resolve(null);
-        }
-      });
-    });
+      (res) => {
+        const chunks = []
+        res.on('data', (chunk) => chunks.push(chunk))
+        res.on('end', () => {
+          try {
+            resolve(JSON.parse(Buffer.concat(chunks).toString()))
+          } catch (e) {
+            resolve(null)
+          }
+        })
+      }
+    )
 
     req.on('error', (err) => {
-      console.error('[resend] Error:', err.message);
-      resolve(null);
-    });
+      console.error('[resend] Error:', err.message)
+      resolve(null)
+    })
 
-    req.write(body);
-    req.end();
-  });
+    req.write(body)
+    req.end()
+  })
 }
 
-module.exports = { sendPriceDropEmail };
+module.exports = { sendPriceDropEmail }

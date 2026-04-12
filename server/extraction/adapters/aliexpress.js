@@ -1,4 +1,8 @@
-const { extractFirstMatch, parsePriceWithCurrency, isValidPrice } = require('../utils/adapter-helpers')
+const {
+  extractFirstMatch,
+  parsePriceWithCurrency,
+  isValidPrice,
+} = require('../utils/adapter-helpers')
 const { parsePrice } = require('../utils/price')
 
 const PRICE_SELECTORS = [
@@ -10,7 +14,7 @@ const PRICE_SELECTORS = [
   '.product-price-current',
 ]
 
-function extract($, url) {
+function extract($, _url) {
   const priceMatch = extractFirstMatch($, PRICE_SELECTORS, (text) => parsePrice(text) !== null)
   if (!priceMatch) return null
 
@@ -28,7 +32,14 @@ function extract($, url) {
     $('img.magnifier-image').first().attr('src') ||
     null
 
-  return { name, price, currency: currency || 'USD', image_url: imageUrl, method: 'adapter', selector: priceMatch.selector }
+  return {
+    name,
+    price,
+    currency: currency || 'USD',
+    image_url: imageUrl,
+    method: 'adapter',
+    selector: priceMatch.selector,
+  }
 }
 
 module.exports = { extract, domains: ['aliexpress.com', 'aliexpress.us'] }

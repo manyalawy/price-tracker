@@ -1,4 +1,8 @@
-const { extractFirstMatch, parsePriceWithCurrency, isValidPrice } = require('../utils/adapter-helpers')
+const {
+  extractFirstMatch,
+  parsePriceWithCurrency,
+  isValidPrice,
+} = require('../utils/adapter-helpers')
 const { parsePrice } = require('../utils/price')
 
 const PRICE_SELECTORS = [
@@ -12,7 +16,7 @@ const PRICE_SELECTORS = [
 
 const BID_SELECTORS = ['#prcIsum_bid498', '.vi-VR-cvipPrice', '#bidPrice']
 
-function extract($, url) {
+function extract($, _url) {
   const validatePrice = (text) => parsePrice(text) !== null
 
   const priceMatch =
@@ -36,7 +40,17 @@ function extract($, url) {
     $('meta[property="og:image"]').first().attr('content') ||
     null
 
-  return { name, price, currency, image_url: imageUrl, method: 'adapter', selector: priceMatch.selector }
+  return {
+    name,
+    price,
+    currency,
+    image_url: imageUrl,
+    method: 'adapter',
+    selector: priceMatch.selector,
+  }
 }
 
-module.exports = { extract, domains: ['ebay.com', 'ebay.co.uk', 'ebay.de', 'ebay.fr', 'ebay.ca', 'ebay.com.au'] }
+module.exports = {
+  extract,
+  domains: ['ebay.com', 'ebay.co.uk', 'ebay.de', 'ebay.fr', 'ebay.ca', 'ebay.com.au'],
+}

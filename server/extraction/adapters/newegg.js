@@ -7,7 +7,7 @@ const PRICE_SELECTORS = [
   '[itemprop="price"]',
 ]
 
-function extract($, url) {
+function extract($, _url) {
   let priceText = null
   let selector = null
 

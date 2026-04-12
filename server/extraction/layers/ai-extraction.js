@@ -1,13 +1,13 @@
-const Anthropic = require('@anthropic-ai/sdk');
-const { cleanHtml, truncateHtml } = require('../utils/html');
+const Anthropic = require('@anthropic-ai/sdk')
+const { cleanHtml, truncateHtml } = require('../utils/html')
 
-let client = null;
+let client = null
 
 function getClient() {
   if (!client) {
-    client = new Anthropic();
+    client = new Anthropic()
   }
-  return client;
+  return client
 }
 
 /**
@@ -15,15 +15,15 @@ function getClient() {
  * Sends cleaned, truncated HTML and asks for structured extraction.
  */
 async function extract(html, url) {
-  const cleaned = cleanHtml(html);
-  const truncated = truncateHtml(cleaned, 12000);
+  const cleaned = cleanHtml(html)
+  const truncated = truncateHtml(cleaned, 12000)
 
   if (!truncated || truncated.length < 50) {
-    return null;
+    return null
   }
 
   try {
-    const anthropic = getClient();
+    const anthropic = getClient()
     const response = await anthropic.messages.create({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 256,
@@ -46,20 +46,20 @@ Webpage content:
 ${truncated}`,
         },
       ],
-    });
+    })
 
-    const text = response.content[0]?.text?.trim();
-    if (!text) return null;
+    const text = response.content[0]?.text?.trim()
+    if (!text) return null
 
     // Parse the JSON response
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return null;
+    const jsonMatch = text.match(/\{[\s\S]*\}/)
+    if (!jsonMatch) return null
 
-    const data = JSON.parse(jsonMatch[0]);
-    if (data.error || !data.price) return null;
+    const data = JSON.parse(jsonMatch[0])
+    if (data.error || !data.price) return null
 
-    const price = typeof data.price === 'number' ? data.price : parseFloat(data.price);
-    if (isNaN(price) || price <= 0) return null;
+    const price = typeof data.price === 'number' ? data.price : parseFloat(data.price)
+    if (isNaN(price) || price <= 0) return null
 
     return {
       name: data.name || null,
@@ -68,11 +68,11 @@ ${truncated}`,
       image_url: data.image_url || null,
       method: 'ai',
       selector: null,
-    };
+    }
   } catch (err) {
-    console.error('[ai-extraction] Error:', err.message);
-    return null;
+    console.error('[ai-extraction] Error:', err.message)
+    return null
   }
 }
 
-module.exports = { extract };
+module.exports = { extract }

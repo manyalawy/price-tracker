@@ -46,7 +46,14 @@ async function extract($, url) {
 
   const imageUrl = $('meta[property="og:image"]').first().attr('content') || null
 
-  return { name, price, currency: 'USD', image_url: imageUrl, method: 'adapter', selector: 'target-css' }
+  return {
+    name,
+    price,
+    currency: 'USD',
+    image_url: imageUrl,
+    method: 'adapter',
+    selector: 'target-css',
+  }
 }
 
 module.exports = { extract, domains: ['target.com'], isAsync: true }

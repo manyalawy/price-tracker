@@ -1,4 +1,4 @@
-const { parsePrice, detectCurrency } = require('../utils/price');
+const { parsePrice, detectCurrency } = require('../utils/price')
 
 // Common price CSS patterns found across e-commerce sites
 const COMMON_PRICE_SELECTORS = [
@@ -25,7 +25,7 @@ const COMMON_PRICE_SELECTORS = [
   '.price-current',
   '.price .money',
   '.money',
-];
+]
 
 const COMMON_NAME_SELECTORS = [
   'h1[class*="product" i][class*="title" i]',
@@ -37,7 +37,7 @@ const COMMON_NAME_SELECTORS = [
   '#product-title',
   '#product-name',
   'h1',
-];
+]
 
 /**
  * Extract product price using CSS heuristics.
@@ -46,8 +46,8 @@ const COMMON_NAME_SELECTORS = [
 function extract($, url, cachedSelector) {
   // Try cached selector first
   if (cachedSelector) {
-    const text = $(cachedSelector).first().text().trim();
-    const price = parsePrice(text);
+    const text = $(cachedSelector).first().text().trim()
+    const price = parsePrice(text)
     if (price !== null) {
       return {
         name: extractName($),
@@ -56,14 +56,14 @@ function extract($, url, cachedSelector) {
         image_url: extractImage($),
         method: 'css',
         selector: cachedSelector,
-      };
+      }
     }
   }
 
   // Try data-price attributes
-  const dataPriceEl = $('[data-price]').first();
+  const dataPriceEl = $('[data-price]').first()
   if (dataPriceEl.length) {
-    const price = parsePrice(dataPriceEl.attr('data-price'));
+    const price = parsePrice(dataPriceEl.attr('data-price'))
     if (price !== null) {
       return {
         name: extractName($),
@@ -72,18 +72,18 @@ function extract($, url, cachedSelector) {
         image_url: extractImage($),
         method: 'css',
         selector: '[data-price]',
-      };
+      }
     }
   }
 
   // Try common price selectors
   for (const sel of COMMON_PRICE_SELECTORS) {
     try {
-      const el = $(sel).first();
-      const text = el.text().trim();
-      if (!text) continue;
+      const el = $(sel).first()
+      const text = el.text().trim()
+      if (!text) continue
 
-      const price = parsePrice(text);
+      const price = parsePrice(text)
       if (price !== null && price > 0 && price < 1000000) {
         return {
           name: extractName($),
@@ -92,27 +92,31 @@ function extract($, url, cachedSelector) {
           image_url: extractImage($),
           method: 'css',
           selector: sel,
-        };
+        }
       }
-    } catch (e) { /* skip invalid selector */ }
+    } catch (e) {
+      /* skip invalid selector */
+    }
   }
 
-  return null;
+  return null
 }
 
 function extractName($) {
   for (const sel of COMMON_NAME_SELECTORS) {
-    const text = $(sel).first().text().trim();
-    if (text && text.length > 2 && text.length < 500) return text;
+    const text = $(sel).first().text().trim()
+    if (text && text.length > 2 && text.length < 500) return text
   }
-  return null;
+  return null
 }
 
 function extractImage($) {
-  return $('meta[property="og:image"]').attr('content')
-    || $('[itemprop="image"]').first().attr('src')
-    || $('img.product-image').first().attr('src')
-    || null;
+  return (
+    $('meta[property="og:image"]').attr('content') ||
+    $('[itemprop="image"]').first().attr('src') ||
+    $('img.product-image').first().attr('src') ||
+    null
+  )
 }
 
-module.exports = { extract };
+module.exports = { extract }

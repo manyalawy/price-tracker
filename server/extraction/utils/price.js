@@ -16,7 +16,7 @@ const CURRENCY_PATTERNS = [
   { symbol: '₺', code: 'TRY', regex: /₺|TRY/ },
   { symbol: 'د.إ', code: 'AED', regex: /د\.إ|AED/ },
   { symbol: 'ج.م', code: 'EGP', regex: /ج\.م|EGP|EGP£/ },
-];
+]
 
 /**
  * Parse a price string into a numeric value.
@@ -27,41 +27,41 @@ const CURRENCY_PATTERNS = [
  * @returns {number|null} Parsed numeric price, or null if unparseable.
  */
 function parsePrice(input) {
-  if (input == null) return null;
+  if (input === null || input === undefined) return null
 
-  const str = String(input).trim();
+  const str = String(input).trim()
 
   // Handle price ranges — take the lower value
-  const rangeSeparators = [' - ', ' – ', ' — ', ' to ', '–', '—'];
+  const rangeSeparators = [' - ', ' – ', ' — ', ' to ', '–', '—']
   for (const sep of rangeSeparators) {
     if (str.includes(sep)) {
-      const parts = str.split(sep);
-      const lower = parsePrice(parts[0]);
-      return lower;
+      const parts = str.split(sep)
+      const lower = parsePrice(parts[0])
+      return lower
     }
   }
 
   // Strip currency symbols, letters (except for decimal/thousands markers), and whitespace
   let cleaned = str
     .replace(/[^\d.,\-]/g, '') // keep digits, dot, comma, minus
-    .trim();
+    .trim()
 
-  if (!cleaned) return null;
+  if (!cleaned) return null
 
   // Detect European format: e.g. "1.299,99" — period as thousands, comma as decimal
-  const europeanFormat = /^\d{1,3}(\.\d{3})+(,\d{1,2})?$/.test(cleaned);
+  const europeanFormat = /^\d{1,3}(\.\d{3})+(,\d{1,2})?$/.test(cleaned)
   if (europeanFormat) {
-    cleaned = cleaned.replace(/\./g, '').replace(',', '.');
+    cleaned = cleaned.replace(/\./g, '').replace(',', '.')
   } else {
     // Standard format: remove commas used as thousands separators
-    cleaned = cleaned.replace(/,/g, '');
+    cleaned = cleaned.replace(/,/g, '')
   }
 
-  const value = parseFloat(cleaned);
-  if (isNaN(value)) return null;
-  if (value < 0) return null; // prices shouldn't be negative
+  const value = parseFloat(cleaned)
+  if (isNaN(value)) return null
+  if (value < 0) return null // prices shouldn't be negative
 
-  return value;
+  return value
 }
 
 /**
@@ -71,17 +71,17 @@ function parsePrice(input) {
  * @returns {string} ISO 4217 currency code (e.g. "USD"), or "USD" as default fallback.
  */
 function detectCurrency(input) {
-  if (input == null) return 'USD';
+  if (input === null || input === undefined) return 'USD'
 
-  const str = String(input).trim();
+  const str = String(input).trim()
 
   for (const currency of CURRENCY_PATTERNS) {
     if (currency.regex.test(str)) {
-      return currency.code;
+      return currency.code
     }
   }
 
-  return 'USD';
+  return 'USD'
 }
 
-module.exports = { parsePrice, detectCurrency };
+module.exports = { parsePrice, detectCurrency }

@@ -44,7 +44,12 @@ async function notifyPriceDrop(product, user) {
           sound: 'default',
         },
       ])
-      dispatched.push({ product_id: product.id, user_id: user.id, type: 'push', sent_at: new Date().toISOString() })
+      dispatched.push({
+        product_id: product.id,
+        user_id: user.id,
+        type: 'push',
+        sent_at: new Date().toISOString(),
+      })
     } catch (err) {
       console.error('[notification.service] Push error:', err.message)
     }
@@ -60,7 +65,12 @@ async function notifyPriceDrop(product, user) {
         currency: product.currency || 'USD',
         productUrl: product.url,
       })
-      dispatched.push({ product_id: product.id, user_id: user.id, type: 'email', sent_at: new Date().toISOString() })
+      dispatched.push({
+        product_id: product.id,
+        user_id: user.id,
+        type: 'email',
+        sent_at: new Date().toISOString(),
+      })
     } catch (err) {
       console.error('[notification.service] Email error:', err.message)
     }

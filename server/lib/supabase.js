@@ -12,4 +12,4 @@ function getSupabase() {
   return supabase
 }
 
-module.exports = { getSupabase };
+module.exports = { getSupabase }

@@ -1,6 +1,6 @@
 const { extractJsonLd, parsePriceWithCurrency, isValidPrice } = require('../utils/adapter-helpers')
 
-function extract($, url) {
+function extract($, _url) {
   const jsonLdResult = extractJsonLd($, 'Walmart Product')
   if (jsonLdResult) return jsonLdResult
 

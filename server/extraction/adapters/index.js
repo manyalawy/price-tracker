@@ -1,20 +1,20 @@
-const amazon = require('./amazon');
-const walmart = require('./walmart');
-const bestbuy = require('./bestbuy');
-const shopify = require('./shopify');
-const ebay = require('./ebay');
-const target = require('./target');
-const aliexpress = require('./aliexpress');
-const etsy = require('./etsy');
-const newegg = require('./newegg');
+const amazon = require('./amazon')
+const walmart = require('./walmart')
+const bestbuy = require('./bestbuy')
+const shopify = require('./shopify')
+const ebay = require('./ebay')
+const target = require('./target')
+const aliexpress = require('./aliexpress')
+const etsy = require('./etsy')
+const newegg = require('./newegg')
 
-const adapters = [amazon, walmart, bestbuy, shopify, ebay, target, aliexpress, etsy, newegg];
+const adapters = [amazon, walmart, bestbuy, shopify, ebay, target, aliexpress, etsy, newegg]
 
 // Build domain → adapter lookup map
-const registry = new Map();
+const registry = new Map()
 for (const adapter of adapters) {
   for (const domain of adapter.domains) {
-    registry.set(domain, adapter);
+    registry.set(domain, adapter)
   }
 }
 
@@ -26,19 +26,19 @@ for (const adapter of adapters) {
 function getAdapter(domain) {
   // Exact match
   if (registry.has(domain)) {
-    return registry.get(domain);
+    return registry.get(domain)
   }
 
   // Try matching base domain (e.g. "www.amazon.com" → "amazon.com")
-  const parts = domain.split('.');
+  const parts = domain.split('.')
   for (let i = 1; i < parts.length; i++) {
-    const sub = parts.slice(i).join('.');
+    const sub = parts.slice(i).join('.')
     if (registry.has(sub)) {
-      return registry.get(sub);
+      return registry.get(sub)
     }
   }
 
-  return null;
+  return null
 }
 
-module.exports = { getAdapter, shopifyAdapter: shopify };
+module.exports = { getAdapter, shopifyAdapter: shopify }

@@ -1,4 +1,8 @@
-const { extractFirstMatch, parsePriceWithCurrency, isValidPrice } = require('../utils/adapter-helpers')
+const {
+  extractFirstMatch,
+  parsePriceWithCurrency,
+  isValidPrice,
+} = require('../utils/adapter-helpers')
 
 const PRICE_SELECTORS = [
   '.priceToPay .a-offscreen',
@@ -20,7 +24,7 @@ const NAME_SELECTORS = ['#productTitle', '#title', 'h1.product-title-word-break'
 
 const IMAGE_SELECTORS = ['#landingImage', '#imgBlkFront', '#main-image', '.a-dynamic-image']
 
-function extract($, url) {
+function extract($, _url) {
   const nameMatch = extractFirstMatch($, NAME_SELECTORS)
   const name = nameMatch ? nameMatch.text : 'Amazon Product'
 
@@ -33,17 +37,38 @@ function extract($, url) {
   let imageUrl = null
   for (const sel of IMAGE_SELECTORS) {
     const src = $(sel).first().attr('src')
-    if (src) { imageUrl = src; break }
+    if (src) {
+      imageUrl = src
+      break
+    }
   }
 
-  return { name, price, currency, image_url: imageUrl, method: 'adapter', selector: priceMatch.selector }
+  return {
+    name,
+    price,
+    currency,
+    image_url: imageUrl,
+    method: 'adapter',
+    selector: priceMatch.selector,
+  }
 }
 
 module.exports = {
   extract,
   domains: [
-    'amazon.com', 'amazon.co.uk', 'amazon.ca', 'amazon.de', 'amazon.fr',
-    'amazon.it', 'amazon.es', 'amazon.co.jp', 'amazon.in', 'amazon.com.au',
-    'amazon.com.br', 'amazon.eg', 'amazon.sa', 'amazon.ae',
+    'amazon.com',
+    'amazon.co.uk',
+    'amazon.ca',
+    'amazon.de',
+    'amazon.fr',
+    'amazon.it',
+    'amazon.es',
+    'amazon.co.jp',
+    'amazon.in',
+    'amazon.com.au',
+    'amazon.com.br',
+    'amazon.eg',
+    'amazon.sa',
+    'amazon.ae',
   ],
 }

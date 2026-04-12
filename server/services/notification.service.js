@@ -1,6 +1,7 @@
 const { getSupabase } = require('../lib/supabase')
 const { sendPushNotifications } = require('../notifications/expo-push')
 const { sendPriceDropEmail } = require('../notifications/resend-email')
+const logger = require('../lib/logger')
 
 const DEDUP_WINDOW_MS = 24 * 60 * 60 * 1000 // 24 hours
 
@@ -51,7 +52,7 @@ async function notifyPriceDrop(product, user) {
         sent_at: new Date().toISOString(),
       })
     } catch (err) {
-      console.error('[notification.service] Push error:', err.message)
+      logger.error({ err }, '[notification.service] Push error')
     }
   }
 
@@ -72,7 +73,7 @@ async function notifyPriceDrop(product, user) {
         sent_at: new Date().toISOString(),
       })
     } catch (err) {
-      console.error('[notification.service] Email error:', err.message)
+      logger.error({ err }, '[notification.service] Email error')
     }
   }
 

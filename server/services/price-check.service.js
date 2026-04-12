@@ -1,6 +1,7 @@
 const { getSupabase } = require('../lib/supabase')
 const { extractProduct } = require('../extraction/pipeline')
 const { notifyPriceDrop } = require('./notification.service')
+const logger = require('../lib/logger')
 
 const CHECK_LIMIT = 20 // max products processed per cron tick
 const CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000 // 24 hours
@@ -100,7 +101,7 @@ async function checkPrices() {
         results.notifications++
       }
     } catch (err) {
-      console.error(`[price-check.service] Error for product ${product.id}:`, err.message)
+      logger.error({ productId: product.id, err }, '[price-check.service] Error processing product')
       results.errors++
     }
   }

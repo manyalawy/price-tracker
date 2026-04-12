@@ -1,5 +1,6 @@
 const Anthropic = require('@anthropic-ai/sdk')
 const { cleanHtml, truncateHtml } = require('../utils/html')
+const logger = require('../../lib/logger')
 
 let client = null
 
@@ -70,7 +71,7 @@ ${truncated}`,
       selector: null,
     }
   } catch (err) {
-    console.error('[ai-extraction] Error:', err.message)
+    logger.error({ err }, '[ai-extraction] Error')
     return null
   }
 }

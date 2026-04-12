@@ -1,5 +1,6 @@
 const https = require('https')
 const { resendKey: apiKey } = require('../lib/config')
+const logger = require('../lib/logger')
 
 /**
  * Send a price drop email via Resend API.
@@ -67,7 +68,7 @@ async function sendPriceDropEmail({
     )
 
     req.on('error', (err) => {
-      console.error('[resend] Error:', err.message)
+      logger.error({ err }, '[resend] Error')
       resolve(null)
     })
 

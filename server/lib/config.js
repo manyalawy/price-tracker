@@ -13,6 +13,8 @@ const config = Object.freeze({
   resendKey: requireEnv('RESEND_API_KEY'),
   apiKey: requireEnv('API_KEY'),
   port: parseInt(process.env.PORT, 10) || 3001,
+  betterStackToken: process.env.BETTERSTACK_SOURCE_TOKEN || null,
+  sentryDsn: process.env.SENTRY_DSN || null,
 })
 
 module.exports = config

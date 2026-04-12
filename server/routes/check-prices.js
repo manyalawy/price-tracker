@@ -1,5 +1,6 @@
 const express = require('express')
 const { checkPrices } = require('../services/price-check.service')
+const logger = require('../lib/logger')
 
 const router = express.Router()
 
@@ -12,7 +13,7 @@ router.post('/check-prices', async (_req, res) => {
     const results = await checkPrices()
     res.json(results)
   } catch (err) {
-    console.error('[/check-prices] Fatal error:', err)
+    logger.error({ err }, '[/check-prices] Fatal error')
     res.status(500).json({ error: 'Failed to check prices', details: err.message })
   }
 })

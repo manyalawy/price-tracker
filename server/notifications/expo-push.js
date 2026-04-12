@@ -1,4 +1,5 @@
 const https = require('https')
+const logger = require('../lib/logger')
 
 const EXPO_PUSH_URL = 'https://exp.host/--/api/v2/push/send'
 const BATCH_SIZE = 100
@@ -53,7 +54,7 @@ function sendBatch(messages) {
     )
 
     req.on('error', (err) => {
-      console.error('[expo-push] Error:', err.message)
+      logger.error({ err }, '[expo-push] Error')
       resolve([])
     })
 

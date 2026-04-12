@@ -1,17 +1,24 @@
+const { initSentry, Sentry } = require('./lib/sentry')
+initSentry()
+
 const express = require('express')
 const cors = require('cors')
 const helmet = require('helmet')
 const rateLimit = require('express-rate-limit')
 const { requireApiKey } = require('./middleware/auth')
+const { requestLogger } = require('./middleware/request-logger')
+const { errorHandler } = require('./middleware/error-handler')
 const { extractProduct } = require('./extraction/pipeline')
 const checkPricesRouter = require('./routes/check-prices')
 const config = require('./lib/config')
+const logger = require('./lib/logger')
 
 const app = express()
 
 app.use(helmet())
 app.use(cors())
 app.use(express.json())
+app.use(requestLogger)
 
 app.use(
   rateLimit({
@@ -30,7 +37,7 @@ app.get('/', (_req, res) => {
 
 app.use(requireApiKey)
 
-app.post('/extract', async (req, res) => {
+app.post('/extract', async (req, res, next) => {
   const { url } = req.body
   if (!url || typeof url !== 'string') {
     return res.status(400).json({ error: 'Missing or invalid "url" in request body.' })
@@ -39,15 +46,17 @@ app.post('/extract', async (req, res) => {
     const result = await extractProduct(url)
     return res.json(result)
   } catch (err) {
-    console.error('[/extract] error:', err)
-    return res.status(500).json({ error: 'Failed to extract product data.' })
+    next(err)
   }
 })
 
 app.use(checkPricesRouter)
 
+app.use(Sentry.expressErrorHandler())
+app.use(errorHandler)
+
 app.listen(config.port, () => {
-  console.log(`price-track-server running on port ${config.port}`) // eslint-disable-line no-console
+  logger.info(`price-track-server running on port ${config.port}`)
 })
 
 module.exports = app

@@ -1,6 +1,7 @@
 const cheerio = require('cheerio')
 const { URL } = require('url')
 const { fetchPage } = require('./utils/html')
+const logger = require('../lib/logger')
 const { getAdapter, shopifyAdapter } = require('./adapters')
 const structuredData = require('./layers/structured-data')
 const cssHeuristics = require('./layers/css-heuristics')
@@ -38,7 +39,7 @@ async function extractProduct(url, { cachedSelector, cachedMethod } = {}) {
         : adapter.extract($, url, html)
       if (result) return { ...result, domain }
     } catch (err) {
-      console.error(`[pipeline] Adapter error for ${domain}:`, err.message)
+      logger.error({ domain, err }, `[pipeline] Adapter error for ${domain}`)
     }
   }
 
@@ -57,7 +58,7 @@ async function extractProduct(url, { cachedSelector, cachedMethod } = {}) {
     const result = structuredData.extract($, url)
     if (result) return { ...result, domain }
   } catch (err) {
-    console.error('[pipeline] Structured data error:', err.message)
+    logger.error({ err }, '[pipeline] Structured data error')
   }
 
   // Layer 3: CSS heuristics
@@ -65,7 +66,7 @@ async function extractProduct(url, { cachedSelector, cachedMethod } = {}) {
     const result = cssHeuristics.extract($, url, cachedSelector)
     if (result) return { ...result, domain }
   } catch (err) {
-    console.error('[pipeline] CSS heuristics error:', err.message)
+    logger.error({ err }, '[pipeline] CSS heuristics error')
   }
 
   // Layer 4: AI extraction (needs raw HTML string)
@@ -73,7 +74,7 @@ async function extractProduct(url, { cachedSelector, cachedMethod } = {}) {
     const result = await aiExtraction.extract(html, url)
     if (result) return { ...result, domain }
   } catch (err) {
-    console.error('[pipeline] AI extraction error:', err.message)
+    logger.error({ err }, '[pipeline] AI extraction error')
   }
 
   throw new Error(`Failed to extract product data from ${url}`)

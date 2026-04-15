@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.xl,
-    paddingBottom: 80,
+    paddingBottom: 100,
   },
   title: {
     color: colors.textWarm,

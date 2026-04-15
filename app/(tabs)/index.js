@@ -105,6 +105,7 @@ export default function HomeScreen() {
               tintColor={colors.accent}
             />
           }
+          contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <EmptyState
@@ -158,6 +159,9 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.xs,
     fontWeight: typography.weights.bold,
     letterSpacing: 0.5,
+  },
+  listContent: {
+    paddingBottom: 100,
   },
   sectionLabel: {
     color: colors.textMuted,

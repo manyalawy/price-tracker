@@ -80,7 +80,7 @@ export default function AddScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.content} keyboardShouldPersistTaps="handled">
+      <ScrollView style={styles.content} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
         <Text style={styles.title}>Add Product</Text>
         <Text style={styles.subtitle}>Paste a product URL to start tracking</Text>
 
@@ -146,6 +146,9 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: spacing.md,
+  },
+  scrollContent: {
+    paddingBottom: 100,
   },
   title: {
     color: colors.text,

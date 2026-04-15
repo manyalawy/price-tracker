@@ -1,17 +1,24 @@
 import { View, TextInput, StyleSheet } from 'react-native';
-import { colors, spacing, typography, borderRadius } from '../constants/theme';
+import { Ionicons } from '@expo/vector-icons';
+import { colors, typography, borderRadius } from '../constants/theme';
 
-export default function SearchBar({ value, onChangeText, placeholder = 'Search products...' }) {
+export default function SearchBar({ value, onChangeText, placeholder = 'Search products or stores…' }) {
   return (
     <View style={styles.container}>
       <TextInput
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
-        placeholderTextColor={colors.textMuted}
+        placeholderTextColor={colors.textLabel}
         style={styles.input}
         autoCapitalize="none"
         autoCorrect={false}
+      />
+      <Ionicons
+        name="search-outline"
+        size={18}
+        color={colors.textLabel}
+        style={styles.icon}
       />
     </View>
   );
@@ -19,14 +26,20 @@ export default function SearchBar({ value, onChangeText, placeholder = 'Search p
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: spacing.md,
+    position: 'relative',
+    justifyContent: 'center',
   },
   input: {
-    backgroundColor: colors.card,
+    backgroundColor: colors.iconBg,
     color: colors.text,
     fontSize: typography.sizes.md,
-    paddingVertical: spacing.sm + 2,
-    paddingHorizontal: spacing.md,
-    borderRadius: borderRadius.md,
+    paddingVertical: 22,
+    paddingLeft: 56,
+    paddingRight: 24,
+    borderRadius: borderRadius.sm,
+  },
+  icon: {
+    position: 'absolute',
+    left: 20,
   },
 });

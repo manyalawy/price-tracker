@@ -1,13 +1,14 @@
 import { useEffect, useState, useCallback } from 'react';
 import { View, Text, FlatList, RefreshControl, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { BlurView } from 'expo-blur';
+import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../contexts/AuthContext';
 import { useProducts } from '../../contexts/ProductsContext';
 import ProductCard from '../../components/ProductCard';
 import SearchBar from '../../components/SearchBar';
 import EmptyState from '../../components/ui/EmptyState';
-import SkeletonLoader from '../../components/ui/SkeletonLoader';
-import { colors, spacing, typography } from '../../constants/theme';
+import { colors, spacing, typography, borderRadius } from '../../constants/theme';
 import { useRouter } from 'expo-router';
 
 export default function HomeScreen() {
@@ -16,6 +17,7 @@ export default function HomeScreen() {
   const [search, setSearch] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     fetchProducts();
@@ -34,91 +36,106 @@ export default function HomeScreen() {
       )
     : products;
 
-  const greeting = () => {
-    const hour = new Date().getHours();
-    const name = user?.email ? user.email.split('@')[0] : null;
-    let base;
-    if (hour < 12) base = 'Good morning';
-    else if (hour < 18) base = 'Good afternoon';
-    else base = 'Good evening';
-    return name ? `${base}, ${name}` : base;
-  };
+  const hour = new Date().getHours();
+  const greetingBase = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+  const userName = user?.email ? user.email.split('@')[0] : '';
 
   const priceDrop = products.filter(
     p => p.current_price != null && p.target_price != null && p.current_price <= p.target_price
   ).length;
 
-  if (loading && products.length === 0) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.content}>
-          <SkeletonLoader width="60%" height={28} style={{ marginBottom: 8 }} />
-          <SkeletonLoader width="40%" height={16} style={{ marginBottom: 24 }} />
-          <View style={{ flexDirection: 'row', gap: 16, marginBottom: 16 }}>
-            <SkeletonLoader width="48%" height={80} />
-            <SkeletonLoader width="48%" height={80} />
-          </View>
-          {[1, 2, 3].map(i => (
-            <SkeletonLoader key={i} height={100} style={{ marginBottom: 8 }} />
-          ))}
+  const ListHeader = (
+    <View style={styles.listHeader}>
+      {/* Hero section */}
+      <View style={styles.heroSection}>
+        <View style={styles.greetingGroup}>
+          <Text style={styles.greetingLine}>{greetingBase},</Text>
+          <Text style={styles.greetingLine}>{userName}</Text>
+          <Text style={styles.subtitle}>You're tracking {products.length} products.</Text>
         </View>
-      </SafeAreaView>
-    );
-  }
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.greeting}>{greeting()}</Text>
-        <Text style={styles.subtitle}>
-          {products.length > 0
-            ? `Tracking ${products.length} product${products.length !== 1 ? 's' : ''}`
-            : 'Start tracking product prices'}
-        </Text>
 
         {products.length > 0 && (
-          <>
-            <View style={styles.pillRow}>
-              <View style={styles.pill}>
-                <Text style={styles.pillText}>{products.length} TRACKING</Text>
-              </View>
-              <View style={styles.pill}>
-                <Text style={styles.pillText}>{priceDrop} ↓ TARGET</Text>
-              </View>
+          <View style={styles.pillRow}>
+            <View style={styles.trackingPill}>
+              <Text style={styles.trackingPillText}>{products.length} TRACKING</Text>
             </View>
-            <SearchBar value={search} onChangeText={setSearch} />
-          </>
+            <View style={styles.targetPill}>
+              <View style={styles.targetDot} />
+              <Text style={styles.targetPillText}>{priceDrop} AT TARGET</Text>
+            </View>
+          </View>
         )}
-
-        {filtered.length > 0 && (
-          <Text style={styles.sectionLabel}>LIVE TRACKING</Text>
-        )}
-
-        <FlatList
-          data={filtered}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <ProductCard product={item} />}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              tintColor={colors.accent}
-            />
-          }
-          contentContainerStyle={styles.listContent}
-          showsVerticalScrollIndicator={false}
-          ListEmptyComponent={
-            <EmptyState
-              icon="🗑"
-              title="Nothing tracked yet"
-              message="Start adding links to monitor prices and get notified on drops."
-              actionLabel="Add your first product"
-              onAction={() => router.push('/(tabs)/add')}
-            />
-          }
-        />
       </View>
-    </SafeAreaView>
+
+      {/* Search */}
+      <SearchBar value={search} onChangeText={setSearch} />
+
+      {/* Section label */}
+      {filtered.length > 0 && (
+        <Text style={styles.sectionLabel}>LIVE TRACKING</Text>
+      )}
+    </View>
+  );
+
+  const ListEmpty = loading && products.length === 0 ? (
+    <View style={{ gap: spacing.lg, opacity: 0.4 }}>
+      <Text style={styles.sectionLabel}>SYNCING LATEST…</Text>
+      <View style={{ gap: spacing.lg }}>
+        <View style={{ backgroundColor: colors.groupBg, height: 192, borderRadius: borderRadius.xl }} />
+        <View style={{ backgroundColor: colors.groupBg, height: 192, borderRadius: borderRadius.xl }} />
+      </View>
+    </View>
+  ) : (
+    <EmptyState
+      iconName="archive-outline"
+      title="Nothing tracked yet"
+      message="Start adding links to monitor prices and get notified on drops."
+      actionLabel="Add your first product"
+      onAction={() => router.push('/(tabs)/add')}
+    />
+  );
+
+  return (
+    <View style={styles.container}>
+      <View>
+        <BlurView
+          intensity={30}
+          tint="dark"
+          style={[
+            styles.header,
+            {
+              paddingTop: insets.top + spacing.md,
+              paddingBottom: spacing.md,
+              paddingHorizontal: spacing.lg,
+              backgroundColor: 'rgba(14,14,16,0.8)',
+            },
+          ]}
+        >
+          <View style={styles.headerLeft}>
+            <Ionicons name="pricetag" size={16} color={colors.accent} />
+            <Text style={styles.headerTitle}>PriceTrack</Text>
+          </View>
+          <Ionicons name="notifications-outline" size={22} color={colors.text} />
+        </BlurView>
+      </View>
+
+      <FlatList
+        data={filtered}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => <ProductCard product={item} />}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.accent}
+          />
+        }
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
+        ListHeaderComponent={ListHeader}
+        ListEmptyComponent={ListEmpty}
+      />
+    </View>
   );
 }
 
@@ -127,48 +144,93 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  content: {
-    flex: 1,
-    paddingHorizontal: spacing.md,
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  greeting: {
-    color: colors.text,
-    fontSize: typography.sizes.xxl,
-    fontWeight: typography.weights.bold,
-    marginTop: spacing.md,
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  headerTitle: {
+    fontSize: typography.sizes.xl,
+    color: colors.accent,
+    letterSpacing: -1,
+    fontWeight: typography.weights.regular,
+  },
+  listContent: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: 128,
+    paddingTop: spacing.lg,
+  },
+  listHeader: {
+    gap: 40,
+    marginBottom: spacing.md,
+  },
+  heroSection: {
+    gap: spacing.md,
+  },
+  greetingGroup: {
+    gap: spacing.xs,
+  },
+  greetingLine: {
+    fontSize: typography.sizes.display,
+    color: colors.textWarm,
+    letterSpacing: -0.9,
+    fontWeight: typography.weights.regular,
   },
   subtitle: {
-    color: colors.textSecondary,
     fontSize: typography.sizes.md,
-    marginBottom: spacing.lg,
-    marginTop: spacing.xs,
+    color: colors.textLabel,
   },
   pillRow: {
     flexDirection: 'row',
-    gap: spacing.sm,
-    marginBottom: spacing.md,
+    gap: 12,
   },
-  pill: {
-    backgroundColor: colors.accent + '20',
-    borderRadius: 999,
-    paddingVertical: 4,
-    paddingHorizontal: 10,
+  trackingPill: {
+    backgroundColor: colors.groupBg,
+    borderRadius: borderRadius.full,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
   },
-  pillText: {
+  trackingPillText: {
+    fontSize: 11,
+    color: colors.textLabel,
+    letterSpacing: 1.1,
+    textTransform: 'uppercase',
+    fontWeight: typography.weights.regular,
+  },
+  targetPill: {
+    backgroundColor: colors.accent + '1a',
+    borderRadius: borderRadius.full,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  targetDot: {
+    width: 6,
+    height: 6,
+    backgroundColor: colors.accent,
+    borderRadius: borderRadius.full,
+  },
+  targetPillText: {
+    fontSize: 11,
     color: colors.accent,
-    fontSize: typography.sizes.xs,
-    fontWeight: typography.weights.bold,
-    letterSpacing: 0.5,
-  },
-  listContent: {
-    paddingBottom: 100,
+    letterSpacing: 1.1,
+    textTransform: 'uppercase',
+    fontWeight: typography.weights.regular,
   },
   sectionLabel: {
-    color: colors.textMuted,
-    fontSize: typography.sizes.xs,
-    fontWeight: typography.weights.bold,
-    letterSpacing: 1,
-    marginBottom: spacing.sm,
-    marginTop: spacing.xs,
+    fontSize: 11,
+    color: colors.textLabel,
+    letterSpacing: 1.1,
+    textTransform: 'uppercase',
+    fontWeight: typography.weights.regular,
+    opacity: 0.6,
+    marginBottom: spacing.xs,
   },
 });

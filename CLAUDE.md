@@ -113,6 +113,8 @@ colors.groupBg       // '#131315'  grouped section background
 colors.iconBg        // '#262528'  icon container background
 colors.accent        // '#3fff8b'  neon green — primary action color
 colors.accentDark    // '#2ecc71'  darker accent variant
+colors.accentGradientEnd // '#13ea79'  LinearGradient end color
+colors.accentText    // '#005d2c'  dark green text on accent/gradient backgrounds
 colors.danger        // '#f87171'  error/destructive
 colors.dangerDark    // '#ef4444'  darker danger variant
 colors.dangerAlt     // '#ff716c'  alternate danger
@@ -139,6 +141,7 @@ typography.sizes.lg    // 18
 typography.sizes.xl    // 20
 typography.sizes.xxl   // 24
 typography.sizes.xxxl  // 32
+typography.sizes.display // 36  large price/heading display
 
 // Typography weights
 typography.weights.regular   // '400'

@@ -1,4 +1,5 @@
-import { View, Text, Pressable, StyleSheet, Alert, Image } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Alert } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { colors, spacing, typography, borderRadius } from '../constants/theme';
 import { useProducts } from '../contexts/ProductsContext';
@@ -7,6 +8,7 @@ export default function ProductCard({ product }) {
   const router = useRouter();
   const { deleteProduct } = useProducts();
 
+  const currency = product.currency === 'EUR' ? '€' : product.currency === 'GBP' ? '£' : '$';
   const priceDiff = product.target_price - product.current_price;
   const pctFromTarget = product.target_price > 0
     ? ((priceDiff / product.target_price) * 100).toFixed(0)
@@ -32,43 +34,43 @@ export default function ProductCard({ product }) {
     );
   };
 
-  const currency = product.currency === 'EUR' ? '€' : product.currency === 'GBP' ? '£' : '$';
-
   return (
     <Pressable
       onPress={handlePress}
       onLongPress={handleLongPress}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
-      <View style={styles.row}>
-        {product.image_url ? (
-          <Image source={{ uri: product.image_url }} style={styles.thumbnail} />
-        ) : (
-          <View style={styles.thumbnailFallback}>
-            <Text style={styles.thumbnailLetter}>
-              {product.domain ? product.domain[0].toUpperCase() : '?'}
-            </Text>
+      <View style={styles.topSection}>
+        <View style={styles.topLeft}>
+          <Text style={styles.domain}>{product.domain}</Text>
+          <Text style={styles.name} numberOfLines={2}>{product.name}</Text>
+        </View>
+        {isAtTarget && (
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>{'TARGET\nHIT'}</Text>
           </View>
         )}
-        <View style={styles.content}>
-          <View style={styles.header}>
-            <Text style={styles.domain} numberOfLines={1}>{product.domain}</Text>
-            {isAtTarget && <Text style={styles.badge}>TARGET HIT</Text>}
-          </View>
-          <Text style={styles.name} numberOfLines={2}>{product.name}</Text>
+      </View>
+
+      <View style={styles.bottomSection}>
+        <View>
           <View style={styles.priceRow}>
-            <Text style={styles.price}>{currency}{product.current_price?.toFixed(2)}</Text>
-            <View style={styles.targetContainer}>
-              <Text style={styles.targetLabel}>Target: </Text>
-              <Text style={styles.target}>{currency}{product.target_price?.toFixed(2)}</Text>
-            </View>
+            <Text style={[styles.price, isAtTarget && styles.priceAtTarget]}>
+              {currency}{product.current_price?.toFixed(2)}
+            </Text>
+            <Text style={styles.currencyLabel}>{product.currency || 'USD'}</Text>
           </View>
-          {!isAtTarget && (
-            <Text style={styles.diff}>
-              {currency}{Math.abs(priceDiff).toFixed(2)} above target ({Math.abs(pctFromTarget)}%)
+          {isAtTarget ? (
+            <Text style={styles.targetHitLabel}>
+              Target: {currency}{product.target_price?.toFixed(2)}
+            </Text>
+          ) : (
+            <Text style={styles.diffLabel}>
+              {currency}{Math.abs(priceDiff).toFixed(2)} above target · {Math.abs(pctFromTarget)}%
             </Text>
           )}
         </View>
+        <Ionicons name="stats-chart-outline" size={22} color={colors.textLabel} />
       </View>
     </Pressable>
   );
@@ -76,97 +78,84 @@ export default function ProductCard({ product }) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.card,
-    borderRadius: borderRadius.md,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
+    backgroundColor: colors.cardAlt,
+    borderRadius: borderRadius.xl,
+    padding: spacing.lg,
+    marginBottom: spacing.lg,
   },
   pressed: {
-    backgroundColor: colors.cardHover,
+    opacity: 0.85,
   },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  thumbnail: {
-    width: 60,
-    height: 60,
-    borderRadius: borderRadius.sm,
-    marginRight: spacing.md,
-  },
-  thumbnailFallback: {
-    width: 60,
-    height: 60,
-    borderRadius: borderRadius.sm,
-    backgroundColor: colors.cardHover,
-    marginRight: spacing.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  thumbnailLetter: {
-    color: colors.textMuted,
-    fontSize: typography.sizes.xl,
-    fontWeight: typography.weights.bold,
-  },
-  content: {
-    flex: 1,
-  },
-  header: {
+  topSection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.xs,
+    alignItems: 'flex-start',
+  },
+  topLeft: {
+    flex: 1,
+    marginRight: spacing.sm,
+    gap: spacing.xs,
   },
   domain: {
-    color: colors.textMuted,
-    fontSize: typography.sizes.xs,
+    color: colors.textLabel,
+    fontSize: 10,
+    letterSpacing: 1.5,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    flex: 1,
-    marginRight: spacing.xs,
-  },
-  badge: {
-    color: colors.accent,
-    fontSize: typography.sizes.xs,
-    fontWeight: typography.weights.bold,
-    backgroundColor: colors.accent + '20',
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    borderRadius: borderRadius.sm,
-    overflow: 'hidden',
+    fontWeight: typography.weights.regular,
   },
   name: {
-    color: colors.text,
-    fontSize: typography.sizes.md,
-    fontWeight: typography.weights.semibold,
-    marginBottom: spacing.sm,
+    color: colors.textWarm,
+    fontSize: typography.sizes.xl,
+    fontWeight: typography.weights.regular,
+  },
+  badge: {
+    backgroundColor: colors.accent + '1a',
+    borderRadius: borderRadius.full,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+  },
+  badgeText: {
+    color: colors.accent,
+    fontSize: 10,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    textAlign: 'center',
+    fontWeight: typography.weights.regular,
+  },
+  bottomSection: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    marginTop: spacing.lg,
   },
   priceRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'baseline',
+    alignItems: 'flex-end',
   },
   price: {
-    color: colors.text,
-    fontSize: typography.sizes.xl,
-    fontWeight: typography.weights.bold,
+    fontSize: typography.sizes.display,
+    letterSpacing: -1.8,
+    color: colors.textWarm,
+    fontWeight: typography.weights.regular,
   },
-  targetContainer: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-  },
-  targetLabel: {
-    color: colors.textMuted,
-    fontSize: typography.sizes.sm,
-  },
-  target: {
+  priceAtTarget: {
     color: colors.accent,
-    fontSize: typography.sizes.md,
-    fontWeight: typography.weights.semibold,
   },
-  diff: {
-    color: colors.textSecondary,
+  currencyLabel: {
+    fontSize: 10,
+    color: colors.textLabel,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginLeft: spacing.xs,
+    marginBottom: 4,
+  },
+  targetHitLabel: {
     fontSize: typography.sizes.xs,
-    marginTop: spacing.xs,
+    color: colors.textLabel,
+  },
+  diffLabel: {
+    fontSize: typography.sizes.xs,
+    color: colors.dangerAlt,
+    marginTop: 4,
   },
 });

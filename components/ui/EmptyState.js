@@ -1,15 +1,33 @@
-import { View, Text, StyleSheet } from 'react-native';
-import { colors, spacing, typography } from '../../constants/theme';
-import Button from './Button';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { colors, spacing, typography, borderRadius } from '../../constants/theme';
 
-export default function EmptyState({ icon, title, message, actionLabel, onAction }) {
+export default function EmptyState({ iconName, title, message, actionLabel, onAction }) {
   return (
     <View style={styles.container}>
-      {icon && <Text style={styles.icon}>{icon}</Text>}
-      <Text style={styles.title}>{title}</Text>
-      {message && <Text style={styles.message}>{message}</Text>}
+      <View style={styles.iconCircle}>
+        <Ionicons name={iconName} size={30} color={colors.textLabel} />
+      </View>
+
+      <View style={styles.textSection}>
+        <Text style={styles.title}>{title}</Text>
+        {message && <Text style={styles.message}>{message}</Text>}
+      </View>
+
       {actionLabel && onAction && (
-        <Button title={actionLabel} onPress={onAction} variant="primary" style={styles.button} />
+        <View style={styles.buttonSection}>
+          <Pressable onPress={onAction} style={({ pressed }) => pressed && styles.buttonPressed}>
+            <LinearGradient
+              colors={[colors.accent, colors.accentGradientEnd]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={{ borderRadius: borderRadius.full, paddingVertical: 16, paddingHorizontal: spacing.xl }}
+            >
+              <Text style={styles.buttonText}>{actionLabel}</Text>
+            </LinearGradient>
+          </Pressable>
+        </View>
       )}
     </View>
   );
@@ -17,31 +35,45 @@ export default function EmptyState({ icon, title, message, actionLabel, onAction
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.xl * 2,
+    paddingVertical: 48,
   },
-  icon: {
-    fontSize: 48,
-    marginBottom: spacing.md,
+  iconCircle: {
+    width: 96,
+    height: 96,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.groupBg,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  textSection: {
+    marginTop: spacing.lg,
+    gap: spacing.sm,
+    alignItems: 'center',
   },
   title: {
-    color: colors.text,
     fontSize: typography.sizes.xl,
-    fontWeight: typography.weights.semibold,
+    fontWeight: typography.weights.regular,
+    color: colors.textWarm,
     textAlign: 'center',
-    marginBottom: spacing.sm,
   },
   message: {
-    color: colors.textSecondary,
-    fontSize: typography.sizes.md,
+    fontSize: typography.sizes.sm,
+    color: colors.textLabel,
     textAlign: 'center',
-    lineHeight: 22,
+    maxWidth: 280,
   },
-  button: {
+  buttonSection: {
     marginTop: spacing.lg,
-    minWidth: 160,
+  },
+  buttonPressed: {
+    opacity: 0.85,
+  },
+  buttonText: {
+    fontSize: typography.sizes.md,
+    fontWeight: typography.weights.regular,
+    color: colors.accentText,
+    textAlign: 'center',
   },
 });

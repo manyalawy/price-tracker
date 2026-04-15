@@ -7,6 +7,8 @@ export const colors = {
   iconBg: '#262528',
   accent: '#3fff8b',
   accentDark: '#2ecc71',
+  accentGradientEnd: '#13ea79',
+  accentText: '#005d2c',
   danger: '#f87171',
   dangerDark: '#ef4444',
   dangerAlt: '#ff716c',
@@ -36,6 +38,7 @@ export const typography = {
     xl: 20,
     xxl: 24,
     xxxl: 32,
+    display: 36,
   },
   weights: {
     regular: '400',

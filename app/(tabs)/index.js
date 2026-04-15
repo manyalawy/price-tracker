@@ -49,8 +49,7 @@ export default function HomeScreen() {
       {/* Hero section */}
       <View style={styles.heroSection}>
         <View style={styles.greetingGroup}>
-          <Text style={styles.greetingLine}>{greetingBase},</Text>
-          <Text style={styles.greetingLine}>{userName}</Text>
+          <Text style={styles.greetingLine}>{greetingBase}</Text>
           <Text style={styles.subtitle}>You're tracking {products.length} products.</Text>
         </View>
 

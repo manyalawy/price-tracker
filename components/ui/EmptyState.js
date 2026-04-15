@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   textSection: {
-    marginTop: spacing.lg,
+    marginTop: spacing.xs,
     gap: spacing.sm,
     alignItems: 'center',
   },

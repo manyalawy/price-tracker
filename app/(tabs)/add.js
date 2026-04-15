@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, TextInput, ScrollView, StyleSheet, Keyboard, Alert } from 'react-native';
+import { View, Text, TextInput, ScrollView, StyleSheet, Keyboard, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Button from '../../components/ui/Button';
@@ -79,6 +79,7 @@ export default function AddScreen() {
   };
 
   return (
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1, backgroundColor: colors.background }}>
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.content} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
         <Text style={styles.title}>Add Product</Text>
@@ -135,6 +136,7 @@ export default function AddScreen() {
         )}
       </ScrollView>
     </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }
 

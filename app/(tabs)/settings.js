@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { View, Text, Switch, StyleSheet, Alert, Pressable } from 'react-native';
+import { View, Text, Switch, ScrollView, StyleSheet, Alert, Pressable, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
-import Card from '../../components/ui/Card';
-import { colors, spacing, typography } from '../../constants/theme';
+import { colors, spacing, typography, borderRadius } from '../../constants/theme';
 
 export default function SettingsScreen() {
   const { user, signOut } = useAuth();
@@ -46,62 +46,83 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
         <Text style={styles.title}>Settings</Text>
 
-        <Card style={styles.section}>
-          <Text style={styles.sectionTitle}>Account</Text>
-          <View style={styles.accountRow}>
-            <View style={styles.accountIcon}>
-              <Text style={styles.accountIconText}>@</Text>
-            </View>
-            <View>
-              <Text style={styles.accountLabel}>EMAIL ADDRESS</Text>
-              <Text style={styles.email}>{user?.email}</Text>
+        <View style={styles.sections}>
+          {/* ACCOUNT */}
+          <View>
+            <Text style={styles.sectionLabel}>ACCOUNT</Text>
+            <View style={styles.card}>
+              <View style={styles.accountRow}>
+                <View style={styles.iconCircle}>
+                  <Ionicons name="at-circle" size={20} color={colors.accent} />
+                </View>
+                <View style={styles.accountText}>
+                  <Text style={styles.accountEmailLabel}>EMAIL ADDRESS</Text>
+                  <Text style={styles.accountEmail}>{user?.email}</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={18} color={colors.textLabel} />
+              </View>
             </View>
           </View>
-        </Card>
 
-        <Card style={styles.section}>
-          <Text style={styles.sectionTitle}>Notifications</Text>
-
-          <View style={styles.row}>
-            <View>
-              <Text style={styles.rowLabel}>Email Notifications</Text>
-              <Text style={styles.rowDesc}>Get price drop alerts via email</Text>
+          {/* NOTIFICATIONS */}
+          <View>
+            <Text style={styles.sectionLabel}>NOTIFICATIONS</Text>
+            <View style={styles.notifGroup}>
+              <View style={[styles.notifRow, styles.notifRowGap]}>
+                <View style={styles.rowLeft}>
+                  <Text style={styles.rowLabel}>Email Alerts</Text>
+                  <Text style={styles.rowDesc}>Get price drop alerts via email</Text>
+                </View>
+                <Switch
+                  value={emailNotifs}
+                  onValueChange={toggleEmailNotifs}
+                  trackColor={{ false: colors.border, true: '#13ea79' }}
+                  thumbColor={emailNotifs ? '#004f24' : '#ffffff'}
+                  ios_backgroundColor={colors.border}
+                />
+              </View>
+              <View style={styles.notifRow}>
+                <View style={styles.rowLeft}>
+                  <Text style={styles.rowLabel}>Push Notifications</Text>
+                  <Text style={styles.rowDesc}>{pushEnabled ? 'Enabled' : 'Not registered'}</Text>
+                </View>
+                <View style={styles.statusBadge}>
+                  <View style={[styles.statusDot, !pushEnabled && styles.statusDotInactive]} />
+                  <Text style={[styles.statusText, !pushEnabled && styles.statusTextInactive]}>
+                    {pushEnabled ? 'ACTIVE' : 'INACTIVE'}
+                  </Text>
+                </View>
+              </View>
             </View>
-            <Switch
-              value={emailNotifs}
-              onValueChange={toggleEmailNotifs}
-              trackColor={{ false: colors.border, true: colors.accent }}
-              thumbColor="#ffffff"
-            />
           </View>
 
-          <View style={[styles.row, styles.noBorder]}>
-            <View>
-              <Text style={styles.rowLabel}>Push Notifications</Text>
-              <Text style={styles.rowDesc}>{pushEnabled ? 'Enabled' : 'Not registered'}</Text>
+          {/* ABOUT */}
+          <View>
+            <Text style={styles.sectionLabel}>ABOUT</Text>
+            <View style={styles.card}>
+              <View style={styles.versionRow}>
+                <View style={styles.iconSquare}>
+                  <Ionicons name="information-circle" size={20} color={colors.textLabel} />
+                </View>
+                <Text style={styles.versionLabel}>Version</Text>
+                <Text style={styles.versionValue}>PriceTrack v1.0.0</Text>
+              </View>
             </View>
-            <Text style={[styles.pushStatus, pushEnabled && styles.pushStatusActive]}>
-              {pushEnabled ? '● ACTIVE' : '● INACTIVE'}
-            </Text>
           </View>
-        </Card>
-
-        <Card style={styles.section}>
-          <Text style={styles.sectionTitle}>About</Text>
-          <View style={styles.versionRow}>
-            <View style={styles.versionDot} />
-            <Text style={styles.versionLabel}>Version</Text>
-            <Text style={styles.version}>PriceTrack v1.0.0</Text>
-          </View>
-        </Card>
+        </View>
 
         <Pressable onPress={handleSignOut} style={styles.signOut}>
+          <Ionicons name="log-out-outline" size={18} color={colors.dangerAlt} />
           <Text style={styles.signOutText}>Sign Out</Text>
         </Pressable>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -111,113 +132,157 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  content: {
+  scroll: {
     flex: 1,
-    paddingHorizontal: spacing.md,
+  },
+  content: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.xl,
+    paddingBottom: 80,
   },
   title: {
-    color: colors.text,
-    fontSize: typography.sizes.xxl,
+    color: colors.textWarm,
+    fontSize: 36,
     fontWeight: typography.weights.bold,
-    marginTop: spacing.md,
-    marginBottom: spacing.lg,
+    letterSpacing: -1.8,
+    marginBottom: 48,
   },
-  section: {
-    marginBottom: spacing.md,
+  sections: {
+    gap: 48,
   },
-  sectionTitle: {
-    color: colors.textSecondary,
-    fontSize: typography.sizes.xs,
+  sectionLabel: {
+    color: colors.textLabel,
+    fontSize: 11,
     fontWeight: typography.weights.semibold,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: spacing.md,
+    letterSpacing: 1.1,
+    marginBottom: spacing.sm,
+  },
+  card: {
+    backgroundColor: colors.cardAlt,
+    borderRadius: borderRadius.xl,
+    padding: spacing.lg,
   },
   accountRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
   },
-  accountIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.cardHover,
+  iconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.iconBg,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: colors.accent,
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 6,
   },
-  accountIconText: {
-    color: colors.textSecondary,
-    fontSize: typography.sizes.md,
-    fontWeight: '600',
+  accountText: {
+    flex: 1,
+    gap: 2,
   },
-  accountLabel: {
-    color: colors.textMuted,
-    fontSize: typography.sizes.xs,
+  accountEmailLabel: {
+    color: colors.textLabel,
+    fontSize: 11,
+    fontWeight: typography.weights.semibold,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: 2,
+    letterSpacing: 1.1,
   },
-  email: {
-    color: colors.text,
-    fontSize: typography.sizes.md,
+  accountEmail: {
+    color: colors.textWarm,
+    fontSize: typography.sizes.sm,
   },
-  row: {
+  notifGroup: {
+    backgroundColor: colors.groupBg,
+    borderRadius: borderRadius.xl,
+    overflow: 'hidden',
+  },
+  notifRow: {
+    backgroundColor: colors.cardAlt,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: spacing.sm,
-    borderBottomWidth: 0.5,
-    borderBottomColor: colors.border,
+    justifyContent: 'space-between',
   },
-  noBorder: {
-    borderBottomWidth: 0,
+  notifRowGap: {
+    marginBottom: 1,
+  },
+  rowLeft: {
+    gap: 2,
   },
   rowLabel: {
-    color: colors.text,
+    color: colors.textWarm,
     fontSize: typography.sizes.md,
   },
   rowDesc: {
-    color: colors.textMuted,
-    fontSize: typography.sizes.sm,
-    marginTop: 2,
-  },
-  pushStatus: {
-    color: colors.textMuted,
+    color: colors.textLabel,
     fontSize: typography.sizes.xs,
-    fontWeight: '600',
   },
-  pushStatusActive: {
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.accent,
+  },
+  statusDotInactive: {
+    backgroundColor: colors.textLabel,
+  },
+  statusText: {
     color: colors.accent,
+    fontSize: 10,
+    fontWeight: typography.weights.bold,
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+  },
+  statusTextInactive: {
+    color: colors.textLabel,
   },
   versionRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: spacing.md,
   },
-  versionDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: colors.accent,
+  iconSquare: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: colors.iconBg,
+    borderWidth: 1,
+    borderColor: 'rgba(72, 71, 74, 0.10)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   versionLabel: {
-    color: colors.text,
+    color: colors.textWarm,
     fontSize: typography.sizes.md,
     flex: 1,
   },
-  version: {
-    color: colors.textSecondary,
-    fontSize: typography.sizes.md,
+  versionValue: {
+    color: colors.textLabel,
+    fontSize: typography.sizes.sm,
+    fontFamily: Platform.select({ ios: 'Courier', android: 'monospace' }),
   },
   signOut: {
-    marginTop: spacing.lg,
+    marginTop: 36,
+    paddingBottom: 20,
+    flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: spacing.md,
+    justifyContent: 'center',
+    gap: spacing.sm,
   },
   signOutText: {
-    color: colors.danger,
+    color: colors.dangerAlt,
     fontSize: typography.sizes.md,
-    fontWeight: '600',
+    fontWeight: typography.weights.semibold,
   },
 });

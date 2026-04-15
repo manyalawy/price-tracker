@@ -1,13 +1,12 @@
 import { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Keyboard, Alert } from 'react-native';
+import { View, Text, TextInput, ScrollView, StyleSheet, Keyboard, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import ProductPreview from '../../components/ProductPreview';
 import { extractProduct } from '../../lib/api';
 import { useProducts } from '../../contexts/ProductsContext';
-import { colors, spacing, typography } from '../../constants/theme';
+import { colors, spacing, typography, borderRadius } from '../../constants/theme';
 
 export default function AddScreen() {
   const router = useRouter();
@@ -85,16 +84,18 @@ export default function AddScreen() {
         <Text style={styles.title}>Add Product</Text>
         <Text style={styles.subtitle}>Paste a product URL to start tracking</Text>
 
-        {error ? <Text style={styles.error}>{error}</Text> : null}
-
-        <Input
-          label="Product URL"
-          value={url}
-          onChangeText={setUrl}
-          placeholder="https://www.amazon.com/..."
-          autoCapitalize="none"
-          keyboardType="url"
-        />
+        <View style={styles.urlRow}>
+          <Text style={styles.urlIcon}>🔗</Text>
+          <TextInput
+            style={styles.urlInput}
+            value={url}
+            onChangeText={setUrl}
+            placeholder="https://amazon.com/..."
+            placeholderTextColor={colors.textMuted}
+            autoCapitalize="none"
+            keyboardType="url"
+          />
+        </View>
 
         <Button
           title={extracting ? 'Extracting...' : 'Fetch Product'}
@@ -104,17 +105,25 @@ export default function AddScreen() {
           style={styles.button}
         />
 
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+
         {product && (
           <>
             <ProductPreview product={product} />
 
-            <Input
-              label="Target Price"
-              value={targetPrice}
-              onChangeText={setTargetPrice}
-              placeholder="Enter your target price"
-              keyboardType="decimal-pad"
-            />
+            <Text style={styles.sectionLabel}>SET YOUR TARGET PRICE</Text>
+            <View style={styles.priceInputRow}>
+              <Text style={styles.currencyPrefix}>$</Text>
+              <TextInput
+                style={styles.priceInput}
+                value={targetPrice}
+                onChangeText={setTargetPrice}
+                placeholder="0.00"
+                placeholderTextColor={colors.textMuted}
+                keyboardType="decimal-pad"
+              />
+              <Text style={styles.currencySuffix}>USD</Text>
+            </View>
 
             <Button
               title="Start Tracking"
@@ -150,6 +159,24 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
     marginTop: spacing.xs,
   },
+  urlRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.inputBg,
+    borderRadius: borderRadius.md,
+    paddingHorizontal: spacing.md,
+    marginBottom: spacing.md,
+  },
+  urlIcon: {
+    fontSize: 16,
+    marginRight: spacing.sm,
+  },
+  urlInput: {
+    flex: 1,
+    color: colors.text,
+    fontSize: typography.sizes.md,
+    paddingVertical: spacing.md,
+  },
   error: {
     color: colors.danger,
     fontSize: typography.sizes.sm,
@@ -157,5 +184,39 @@ const styles = StyleSheet.create({
   },
   button: {
     marginBottom: spacing.lg,
+  },
+  sectionLabel: {
+    color: colors.textMuted,
+    fontSize: typography.sizes.xs,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginBottom: spacing.sm,
+    marginTop: spacing.md,
+  },
+  priceInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.inputBg,
+    borderRadius: borderRadius.md,
+    paddingHorizontal: spacing.md,
+    marginBottom: spacing.md,
+  },
+  currencyPrefix: {
+    color: colors.textSecondary,
+    fontSize: typography.sizes.xl,
+    marginRight: spacing.xs,
+  },
+  priceInput: {
+    flex: 1,
+    color: colors.text,
+    fontSize: typography.sizes.xl,
+    fontWeight: '600',
+    paddingVertical: spacing.md,
+  },
+  currencySuffix: {
+    color: colors.textMuted,
+    fontSize: typography.sizes.sm,
+    marginLeft: spacing.xs,
   },
 });

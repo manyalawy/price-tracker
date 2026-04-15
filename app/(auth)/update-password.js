@@ -1,50 +1,47 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
-import { Link } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import { colors, spacing, typography } from '../../constants/theme';
 
-export default function ForgotPasswordScreen() {
-  const { resetPassword } = useAuth();
-  const [email, setEmail] = useState('');
+export default function UpdatePasswordScreen() {
+  const { updatePassword } = useAuth();
+  const router = useRouter();
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [sent, setSent] = useState(false);
 
-  const handleReset = async () => {
-    if (!email) {
-      setError('Please enter your email');
+  const handleUpdate = async () => {
+    if (!password || !confirmPassword) {
+      setError('Please fill in both fields');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
       return;
     }
     setLoading(true);
     setError('');
     try {
-      const { error: authError } = await resetPassword(email);
+      const { error: authError } = await updatePassword(password);
       if (authError) {
         setError(authError.message);
       } else {
-        setSent(true);
+        router.replace('/(tabs)');
       }
-    } catch (e) {
+    } catch {
       setError('An unexpected error occurred');
     } finally {
       setLoading(false);
     }
   };
-
-  if (sent) {
-    return (
-      <View style={[styles.container, styles.inner]}>
-        <Text style={styles.title}>Email sent</Text>
-        <Text style={styles.subtitle}>Check your inbox for a password reset link.</Text>
-        <Link href="/(auth)/login" style={styles.link}>
-          <Text style={styles.linkText}>Back to sign in</Text>
-        </Link>
-      </View>
-    );
-  }
 
   return (
     <KeyboardAvoidingView
@@ -52,26 +49,28 @@ export default function ForgotPasswordScreen() {
       style={styles.container}
     >
       <View style={styles.inner}>
-        <Text style={styles.title}>Reset Password</Text>
-        <Text style={styles.subtitle}>Enter your email to receive a reset link</Text>
+        <Text style={styles.title}>New Password</Text>
+        <Text style={styles.subtitle}>Choose a strong password for your account</Text>
 
         <View style={styles.card}>
           {error ? <Text style={styles.error}>{error}</Text> : null}
 
           <Input
-            label="Email"
-            value={email}
-            onChangeText={setEmail}
-            placeholder="you@example.com"
-            keyboardType="email-address"
-            autoCapitalize="none"
+            label="New Password"
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Min. 6 characters"
+            secureTextEntry
+          />
+          <Input
+            label="Confirm Password"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            placeholder="Repeat your password"
+            secureTextEntry
           />
 
-          <Button title="Send Reset Link" onPress={handleReset} loading={loading} style={styles.button} />
-
-          <Link href="/(auth)/login" style={[styles.link, styles.center]}>
-            <Text style={styles.linkText}>Back to sign in</Text>
-          </Link>
+          <Button title="Update Password" onPress={handleUpdate} loading={loading} style={styles.button} />
         </View>
       </View>
     </KeyboardAvoidingView>
@@ -113,16 +112,5 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: spacing.sm,
-  },
-  link: {
-    padding: spacing.xs,
-    marginTop: spacing.lg,
-  },
-  center: {
-    alignSelf: 'center',
-  },
-  linkText: {
-    color: colors.accent,
-    fontSize: typography.sizes.sm,
   },
 });

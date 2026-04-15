@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { Link } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
 import Input from '../../components/ui/Input';
@@ -35,39 +35,52 @@ export default function LoginScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
-      <View style={styles.inner}>
-        <Text style={styles.title}>PriceTrack</Text>
-        <Text style={styles.subtitle}>Sign in to track prices</Text>
+      <ScrollView
+        contentContainerStyle={styles.inner}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.logoSection}>
+          <Text style={styles.logo}>PriceTrack</Text>
+          <Text style={styles.logoSub}>Track prices, save money.</Text>
+        </View>
 
-        {error ? <Text style={styles.error}>{error}</Text> : null}
+        <Text style={styles.title}>Welcome back</Text>
 
-        <Input
-          label="Email"
-          value={email}
-          onChangeText={setEmail}
-          placeholder="you@example.com"
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-        <Input
-          label="Password"
-          value={password}
-          onChangeText={setPassword}
-          placeholder="Your password"
-          secureTextEntry
-        />
+        <View style={styles.card}>
+          {error ? (
+            <View style={styles.errorRow}>
+              <Text style={styles.errorDot}>●</Text>
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          ) : null}
 
-        <Button title="Sign In" onPress={handleLogin} loading={loading} style={styles.button} />
+          <Input
+            label="Email Address"
+            value={email}
+            onChangeText={setEmail}
+            placeholder="you@example.com"
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+          <Input
+            label="Password"
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Your password"
+            secureTextEntry
+          />
 
-        <View style={styles.links}>
-          <Link href="/(auth)/signup" style={styles.link}>
-            <Text style={styles.linkText}>Create account</Text>
-          </Link>
+          <Button title="Sign In" onPress={handleLogin} loading={loading} style={styles.button} />
+
           <Link href="/(auth)/forgot-password" style={styles.link}>
             <Text style={styles.linkText}>Forgot password?</Text>
           </Link>
+          <Link href="/(auth)/signup" style={styles.link}>
+            <Text style={styles.linkText}>New here? Create account</Text>
+          </Link>
         </View>
-      </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
@@ -78,40 +91,69 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   inner: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: 'center',
     paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.xl,
   },
-  title: {
-    color: colors.accent,
-    fontSize: typography.sizes.xxxl,
-    fontWeight: typography.weights.bold,
-    marginBottom: spacing.xs,
-  },
-  subtitle: {
-    color: colors.textSecondary,
-    fontSize: typography.sizes.md,
+  logoSection: {
+    alignItems: 'center',
     marginBottom: spacing.xl,
   },
-  error: {
+  logo: {
+    color: colors.accent,
+    fontSize: typography.sizes.xl,
+    fontWeight: typography.weights.bold,
+    letterSpacing: 0.5,
+  },
+  logoSub: {
+    color: colors.textMuted,
+    fontSize: typography.sizes.xs,
+    marginTop: 2,
+    letterSpacing: 0.3,
+  },
+  title: {
+    color: colors.text,
+    fontSize: typography.sizes.xxl,
+    fontWeight: typography.weights.bold,
+    marginBottom: spacing.md,
+  },
+  card: {
+    backgroundColor: colors.card,
+    borderRadius: 16,
+    padding: spacing.lg,
+  },
+  errorRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: colors.danger + '18',
+    borderRadius: 8,
+    padding: spacing.sm,
+    marginBottom: spacing.md,
+    gap: spacing.xs,
+  },
+  errorDot: {
+    color: colors.danger,
+    fontSize: 8,
+    lineHeight: 20,
+  },
+  errorText: {
     color: colors.danger,
     fontSize: typography.sizes.sm,
-    marginBottom: spacing.md,
-    textAlign: 'center',
+    flex: 1,
+    lineHeight: 20,
   },
   button: {
     marginTop: spacing.sm,
-  },
-  links: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: spacing.lg,
+    marginBottom: spacing.sm,
   },
   link: {
-    padding: spacing.xs,
+    paddingVertical: spacing.xs,
+    alignSelf: 'center',
   },
   linkText: {
     color: colors.accent,
     fontSize: typography.sizes.sm,
+    textAlign: 'center',
   },
 });

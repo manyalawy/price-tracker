@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
-import { View, Text, Switch, StyleSheet, Alert } from 'react-native';
+import { View, Text, Switch, StyleSheet, Alert, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
-import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import { colors, spacing, typography } from '../../constants/theme';
 
@@ -52,7 +51,15 @@ export default function SettingsScreen() {
 
         <Card style={styles.section}>
           <Text style={styles.sectionTitle}>Account</Text>
-          <Text style={styles.email}>{user?.email}</Text>
+          <View style={styles.accountRow}>
+            <View style={styles.accountIcon}>
+              <Text style={styles.accountIconText}>@</Text>
+            </View>
+            <View>
+              <Text style={styles.accountLabel}>EMAIL ADDRESS</Text>
+              <Text style={styles.email}>{user?.email}</Text>
+            </View>
+          </View>
         </Card>
 
         <Card style={styles.section}>
@@ -76,21 +83,24 @@ export default function SettingsScreen() {
               <Text style={styles.rowLabel}>Push Notifications</Text>
               <Text style={styles.rowDesc}>{pushEnabled ? 'Enabled' : 'Not registered'}</Text>
             </View>
-            <View style={[styles.dot, pushEnabled && styles.dotActive]} />
+            <Text style={[styles.pushStatus, pushEnabled && styles.pushStatusActive]}>
+              {pushEnabled ? '● ACTIVE' : '● INACTIVE'}
+            </Text>
           </View>
         </Card>
 
         <Card style={styles.section}>
           <Text style={styles.sectionTitle}>About</Text>
-          <Text style={styles.version}>PriceTrack v1.0.0</Text>
+          <View style={styles.versionRow}>
+            <View style={styles.versionDot} />
+            <Text style={styles.versionLabel}>Version</Text>
+            <Text style={styles.version}>PriceTrack v1.0.0</Text>
+          </View>
         </Card>
 
-        <Button
-          title="Sign Out"
-          variant="danger"
-          onPress={handleSignOut}
-          style={styles.signOut}
-        />
+        <Pressable onPress={handleSignOut} style={styles.signOut}>
+          <Text style={styles.signOutText}>Sign Out</Text>
+        </Pressable>
       </View>
     </SafeAreaView>
   );
@@ -123,6 +133,31 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
     marginBottom: spacing.md,
   },
+  accountRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  accountIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: colors.cardHover,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  accountIconText: {
+    color: colors.textSecondary,
+    fontSize: typography.sizes.md,
+    fontWeight: '600',
+  },
+  accountLabel: {
+    color: colors.textMuted,
+    fontSize: typography.sizes.xs,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 2,
+  },
   email: {
     color: colors.text,
     fontSize: typography.sizes.md,
@@ -147,14 +182,29 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.sm,
     marginTop: 2,
   },
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: colors.textMuted,
+  pushStatus: {
+    color: colors.textMuted,
+    fontSize: typography.sizes.xs,
+    fontWeight: '600',
   },
-  dotActive: {
+  pushStatusActive: {
+    color: colors.accent,
+  },
+  versionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  versionDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
     backgroundColor: colors.accent,
+  },
+  versionLabel: {
+    color: colors.text,
+    fontSize: typography.sizes.md,
+    flex: 1,
   },
   version: {
     color: colors.textSecondary,
@@ -162,5 +212,12 @@ const styles = StyleSheet.create({
   },
   signOut: {
     marginTop: spacing.lg,
+    alignItems: 'center',
+    paddingVertical: spacing.md,
+  },
+  signOutText: {
+    color: colors.danger,
+    fontSize: typography.sizes.md,
+    fontWeight: '600',
   },
 });

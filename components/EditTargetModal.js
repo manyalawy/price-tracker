@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { View, Text, Modal, StyleSheet, Pressable } from 'react-native';
-import Input from './ui/Input';
+import { View, Text, Modal, StyleSheet, Pressable, TextInput } from 'react-native';
 import Button from './ui/Button';
 import { colors, spacing, typography, borderRadius } from '../constants/theme';
 
@@ -18,25 +17,31 @@ export default function EditTargetModal({ visible, currentTarget, onSave, onClos
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade">
+    <Modal visible={visible} transparent animationType="slide">
       <View style={styles.overlay}>
         <View style={styles.modal}>
+          <Text style={styles.label}>SET PRICE ALERT</Text>
           <Text style={styles.title}>Edit Target Price</Text>
+          <Text style={styles.desc}>We'll notify you the instant the price drops below this value.</Text>
 
-          <Input
-            label="New target price"
-            value={value}
-            onChangeText={(t) => { setValue(t); setError(''); }}
-            error={error}
-            placeholder="0.00"
-            keyboardType="decimal-pad"
-            autoFocus
-          />
-
-          <View style={styles.actions}>
-            <Button title="Cancel" variant="ghost" onPress={onClose} style={styles.actionBtn} />
-            <Button title="Save" onPress={handleSave} style={styles.actionBtn} />
+          <View style={styles.priceRow}>
+            <Text style={styles.currencySymbol}>$</Text>
+            <TextInput
+              style={styles.priceInput}
+              value={value}
+              onChangeText={(t) => { setValue(t); setError(''); }}
+              placeholder="0.00"
+              placeholderTextColor={colors.textMuted}
+              keyboardType="decimal-pad"
+              autoFocus
+            />
           </View>
+          {error ? <Text style={styles.error}>{error}</Text> : null}
+
+          <Button title="Save Alert" onPress={handleSave} />
+          <Pressable onPress={onClose}>
+            <Text style={styles.cancelText}>Cancel</Text>
+          </Pressable>
         </View>
       </View>
     </Modal>
@@ -47,13 +52,24 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.7)',
-    justifyContent: 'center',
-    paddingHorizontal: spacing.lg,
+    justifyContent: 'flex-end',
   },
   modal: {
     backgroundColor: colors.card,
-    borderRadius: borderRadius.lg,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
     padding: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xl,
+  },
+  label: {
+    color: colors.textMuted,
+    fontSize: typography.sizes.xs,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    marginBottom: 4,
   },
   title: {
     color: colors.text,
@@ -61,12 +77,40 @@ const styles = StyleSheet.create({
     fontWeight: typography.weights.bold,
     marginBottom: spacing.md,
   },
-  actions: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-    marginTop: spacing.sm,
+  desc: {
+    color: colors.textSecondary,
+    fontSize: typography.sizes.sm,
+    marginBottom: 16,
   },
-  actionBtn: {
+  priceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.inputBg,
+    borderRadius: borderRadius.md,
+    paddingHorizontal: spacing.md,
+    marginBottom: spacing.md,
+  },
+  currencySymbol: {
+    color: colors.textSecondary,
+    fontSize: typography.sizes.xl,
+    marginRight: spacing.xs,
+  },
+  priceInput: {
     flex: 1,
+    color: colors.text,
+    fontSize: typography.sizes.xl,
+    fontWeight: '600',
+    paddingVertical: spacing.md,
+  },
+  error: {
+    color: colors.danger,
+    fontSize: typography.sizes.sm,
+    marginBottom: spacing.sm,
+  },
+  cancelText: {
+    color: colors.textSecondary,
+    fontSize: typography.sizes.md,
+    textAlign: 'center',
+    marginTop: spacing.md,
   },
 });

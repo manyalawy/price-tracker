@@ -77,7 +77,12 @@ export default function ProductDetailScreen() {
       <View style={styles.content}>
         <Text style={styles.domain}>{product.domain}</Text>
         <Text style={styles.name}>{product.name}</Text>
-        <Text style={styles.price}>{currency}{product.current_price?.toFixed(2)}</Text>
+        <View style={styles.priceRow}>
+          <Text style={styles.price}>{currency}{product.current_price?.toFixed(2)}</Text>
+          <Text style={styles.statusBadge}>
+            {product.current_price <= product.target_price ? 'TARGET HIT' : 'ON'}
+          </Text>
+        </View>
 
         {/* Chart */}
         {loadingHistory ? (
@@ -143,11 +148,26 @@ const styles = StyleSheet.create({
     fontWeight: typography.weights.semibold,
     marginBottom: spacing.sm,
   },
+  priceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.lg,
+  },
   price: {
     color: colors.accent,
     fontSize: typography.sizes.xxxl,
     fontWeight: typography.weights.bold,
-    marginBottom: spacing.lg,
+  },
+  statusBadge: {
+    color: colors.accent,
+    fontSize: typography.sizes.xs,
+    fontWeight: '700',
+    backgroundColor: colors.accent + '20',
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 3,
+    borderRadius: 6,
+    overflow: 'hidden',
   },
   statsRow: {
     flexDirection: 'row',

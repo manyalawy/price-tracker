@@ -4,7 +4,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../contexts/AuthContext';
 import { useProducts } from '../../contexts/ProductsContext';
 import ProductCard from '../../components/ProductCard';
-import StatsHeader from '../../components/StatsHeader';
 import SearchBar from '../../components/SearchBar';
 import EmptyState from '../../components/ui/EmptyState';
 import SkeletonLoader from '../../components/ui/SkeletonLoader';
@@ -37,10 +36,17 @@ export default function HomeScreen() {
 
   const greeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 18) return 'Good afternoon';
-    return 'Good evening';
+    const name = user?.email ? user.email.split('@')[0] : null;
+    let base;
+    if (hour < 12) base = 'Good morning';
+    else if (hour < 18) base = 'Good afternoon';
+    else base = 'Good evening';
+    return name ? `${base}, ${name}` : base;
   };
+
+  const priceDrop = products.filter(
+    p => p.current_price != null && p.target_price != null && p.current_price <= p.target_price
+  ).length;
 
   if (loading && products.length === 0) {
     return (
@@ -72,9 +78,20 @@ export default function HomeScreen() {
 
         {products.length > 0 && (
           <>
-            <StatsHeader products={products} />
+            <View style={styles.pillRow}>
+              <View style={styles.pill}>
+                <Text style={styles.pillText}>{products.length} TRACKING</Text>
+              </View>
+              <View style={styles.pill}>
+                <Text style={styles.pillText}>{priceDrop} ↓ TARGET</Text>
+              </View>
+            </View>
             <SearchBar value={search} onChangeText={setSearch} />
           </>
+        )}
+
+        {filtered.length > 0 && (
+          <Text style={styles.sectionLabel}>LIVE TRACKING</Text>
         )}
 
         <FlatList
@@ -91,10 +108,10 @@ export default function HomeScreen() {
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <EmptyState
-              icon="📦"
-              title="No products yet"
-              message="Paste a product URL to start tracking its price."
-              actionLabel="Add Product"
+              icon="🗑"
+              title="Nothing tracked yet"
+              message="Start adding links to monitor prices and get notified on drops."
+              actionLabel="Add your first product"
               onAction={() => router.push('/(tabs)/add')}
             />
           }
@@ -123,6 +140,31 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     fontSize: typography.sizes.md,
     marginBottom: spacing.lg,
+    marginTop: spacing.xs,
+  },
+  pillRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  pill: {
+    backgroundColor: colors.accent + '20',
+    borderRadius: 999,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+  },
+  pillText: {
+    color: colors.accent,
+    fontSize: typography.sizes.xs,
+    fontWeight: typography.weights.bold,
+    letterSpacing: 0.5,
+  },
+  sectionLabel: {
+    color: colors.textMuted,
+    fontSize: typography.sizes.xs,
+    fontWeight: typography.weights.bold,
+    letterSpacing: 1,
+    marginBottom: spacing.sm,
     marginTop: spacing.xs,
   },
 });

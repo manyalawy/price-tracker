@@ -4,8 +4,6 @@ import { colors, spacing, typography, borderRadius } from '../constants/theme';
 export default function ProductPreview({ product }) {
   if (!product) return null;
 
-  const currency = product.currency === 'EUR' ? '€' : product.currency === 'GBP' ? '£' : '$';
-
   return (
     <View style={styles.card}>
       {product.image_url && (
@@ -17,7 +15,7 @@ export default function ProductPreview({ product }) {
         </View>
         <Text style={styles.name} numberOfLines={2}>{product.name}</Text>
         <View style={styles.priceRow}>
-          <Text style={styles.price}>{currency}{product.price?.toFixed(2)}</Text>
+          <Text style={styles.price}>{product.price?.toFixed(2)} {product.currency}</Text>
           <Text style={styles.currentLabel}>CURRENT</Text>
         </View>
       </View>

@@ -152,9 +152,6 @@ export default function AddScreen() {
               <View style={styles.targetPriceWrapper}>
                 <Text style={styles.targetLabel}>SET YOUR TARGET PRICE</Text>
                 <View style={styles.targetInputContainer}>
-                  <View style={styles.targetDollarContainer}>
-                    <Text style={styles.targetDollar}>$</Text>
-                  </View>
                   <TextInput
                     style={styles.targetInput}
                     value={targetPrice}
@@ -164,7 +161,7 @@ export default function AddScreen() {
                     keyboardType="decimal-pad"
                   />
                   <View style={styles.targetUsdContainer}>
-                    <Text style={styles.targetUsd}>USD</Text>
+                    <Text style={styles.targetUsd}>{product.currency}</Text>
                   </View>
                 </View>
               </View>
@@ -317,23 +314,12 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     justifyContent: 'center',
   },
-  targetDollarContainer: {
-    position: 'absolute',
-    left: 24,
-    top: 0,
-    bottom: 0,
-    justifyContent: 'center',
-  },
-  targetDollar: {
-    color: colors.accent,
-    fontSize: typography.sizes.xxl,
-  },
   targetInput: {
     flex: 1,
     color: colors.textMuted,
     fontSize: typography.sizes.display,
     letterSpacing: -0.9,
-    paddingLeft: 48,
+    paddingLeft: spacing.lg,
     paddingRight: 64,
     height: '100%',
   },

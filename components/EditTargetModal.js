@@ -3,7 +3,7 @@ import { View, Text, Modal, StyleSheet, Pressable, TextInput } from 'react-nativ
 import Button from './ui/Button';
 import { colors, spacing, typography, borderRadius } from '../constants/theme';
 
-export default function EditTargetModal({ visible, currentTarget, onSave, onClose }) {
+export default function EditTargetModal({ visible, currentTarget, currency, onSave, onClose }) {
   const [value, setValue] = useState(String(currentTarget || ''));
   const [error, setError] = useState('');
 
@@ -25,7 +25,7 @@ export default function EditTargetModal({ visible, currentTarget, onSave, onClos
           <Text style={styles.desc}>We'll notify you the instant the price drops below this value.</Text>
 
           <View style={styles.priceRow}>
-            <Text style={styles.currencySymbol}>$</Text>
+            <Text style={styles.currencySymbol}>{currency}</Text>
             <TextInput
               style={styles.priceInput}
               value={value}

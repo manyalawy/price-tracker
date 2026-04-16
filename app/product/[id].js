@@ -70,15 +70,13 @@ export default function ProductDetailScreen() {
     );
   }
 
-  const currency = product.currency === 'EUR' ? '€' : product.currency === 'GBP' ? '£' : '$';
-
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.content}>
         <Text style={styles.domain}>{product.domain}</Text>
         <Text style={styles.name}>{product.name}</Text>
         <View style={styles.priceRow}>
-          <Text style={styles.price}>{currency}{product.current_price?.toFixed(2)}</Text>
+          <Text style={styles.price}>{product.current_price?.toFixed(2)} {product.currency}</Text>
           <Text style={styles.statusBadge}>
             {product.current_price <= product.target_price ? 'TARGET HIT' : 'ON'}
           </Text>
@@ -97,9 +95,9 @@ export default function ProductDetailScreen() {
 
         {/* Stats */}
         <View style={styles.statsRow}>
-          <StatCard label="Highest" value={`${currency}${product.highest_price?.toFixed(2) || '—'}`} />
-          <StatCard label="Lowest" value={`${currency}${product.lowest_price?.toFixed(2) || '—'}`} color={colors.accent} />
-          <StatCard label="Target" value={`${currency}${product.target_price?.toFixed(2)}`} color={colors.accent} />
+          <StatCard label="Highest" value={`${product.highest_price?.toFixed(2) || '—'} ${product.currency}`} />
+          <StatCard label="Lowest" value={`${product.lowest_price?.toFixed(2) || '—'} ${product.currency}`} color={colors.accent} />
+          <StatCard label="Target" value={`${product.target_price?.toFixed(2)} ${product.currency}`} color={colors.accent} />
         </View>
 
         {/* Actions */}
@@ -119,6 +117,7 @@ export default function ProductDetailScreen() {
         <EditTargetModal
           visible={editModalVisible}
           currentTarget={product.target_price}
+          currency={product.currency}
           onSave={handleEditTarget}
           onClose={() => setEditModalVisible(false)}
         />

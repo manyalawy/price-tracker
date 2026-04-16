@@ -8,7 +8,6 @@ export default function ProductCard({ product }) {
   const router = useRouter();
   const { deleteProduct } = useProducts();
 
-  const currency = product.currency === 'EUR' ? '€' : product.currency === 'GBP' ? '£' : '$';
   const priceDiff = product.target_price - product.current_price;
   const pctFromTarget = product.target_price > 0
     ? ((priceDiff / product.target_price) * 100).toFixed(0)
@@ -56,17 +55,17 @@ export default function ProductCard({ product }) {
         <View>
           <View style={styles.priceRow}>
             <Text style={[styles.price, isAtTarget && styles.priceAtTarget]}>
-              {currency}{product.current_price?.toFixed(2)}
+              {product.current_price?.toFixed(2)}
             </Text>
-            <Text style={styles.currencyLabel}>{product.currency || 'USD'}</Text>
+            <Text style={styles.currencyLabel}>{product.currency}</Text>
           </View>
           {isAtTarget ? (
             <Text style={styles.targetHitLabel}>
-              Target: {currency}{product.target_price?.toFixed(2)}
+              Target: {product.target_price?.toFixed(2)} {product.currency}
             </Text>
           ) : (
             <Text style={styles.diffLabel}>
-              {currency}{Math.abs(priceDiff).toFixed(2)} above target · {Math.abs(pctFromTarget)}%
+              {Math.abs(priceDiff).toFixed(2)} {product.currency} above target · {Math.abs(pctFromTarget)}%
             </Text>
           )}
         </View>

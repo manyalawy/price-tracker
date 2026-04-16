@@ -1,13 +1,10 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useState } from 'react';
 import { View, Text, ScrollView, Alert, StyleSheet } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useProducts } from '../../contexts/ProductsContext';
-import PriceChart from '../../components/PriceChart';
 import StatCard from '../../components/StatCard';
 import EditTargetModal from '../../components/EditTargetModal';
 import Button from '../../components/ui/Button';
-import SkeletonLoader from '../../components/ui/SkeletonLoader';
-import { fetchPriceHistory, formatChartData } from '../../lib/priceHistory';
 import { colors, spacing, typography } from '../../constants/theme';
 
 export default function ProductDetailScreen() {
@@ -16,32 +13,7 @@ export default function ProductDetailScreen() {
   const { products, deleteProduct, updateTargetPrice } = useProducts();
   const product = products.find(p => p.id === id);
 
-  const [history, setHistory] = useState([]);
-  const [chartData, setChartData] = useState(null);
-  const [range, setRange] = useState(30);
-  const [loadingHistory, setLoadingHistory] = useState(true);
   const [editModalVisible, setEditModalVisible] = useState(false);
-
-  const loadHistory = useCallback(async (days) => {
-    setLoadingHistory(true);
-    try {
-      const data = await fetchPriceHistory(id, days);
-      setHistory(data);
-      setChartData(formatChartData(data));
-    } catch (e) {
-      console.error('Failed to load price history:', e.message);
-    } finally {
-      setLoadingHistory(false);
-    }
-  }, [id]);
-
-  useEffect(() => {
-    loadHistory(range);
-  }, [range, loadHistory]);
-
-  const handleRangeChange = (days) => {
-    setRange(days);
-  };
 
   const handleEditTarget = async (newTarget) => {
     await updateTargetPrice(id, newTarget);
@@ -81,17 +53,6 @@ export default function ProductDetailScreen() {
             {product.current_price <= product.target_price ? 'TARGET HIT' : 'ON'}
           </Text>
         </View>
-
-        {/* Chart */}
-        {loadingHistory ? (
-          <SkeletonLoader height={200} style={{ marginBottom: spacing.md }} />
-        ) : (
-          <PriceChart
-            chartData={chartData}
-            selectedRange={range}
-            onRangeChange={handleRangeChange}
-          />
-        )}
 
         {/* Stats */}
         <View style={styles.statsRow}>

@@ -114,7 +114,6 @@ export default function HomeScreen() {
             <Ionicons name="pricetag" size={16} color={colors.accent} />
             <Text style={styles.headerTitle}>Dipp</Text>
           </View>
-          <Ionicons name="notifications-outline" size={22} color={colors.text} />
         </BlurView>
       </View>
 
@@ -145,7 +144,6 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
   },
   headerLeft: {

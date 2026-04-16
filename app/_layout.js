@@ -51,6 +51,7 @@ function RootLayoutNav() {
             headerStyle: { backgroundColor: colors.background },
             headerTintColor: colors.text,
             headerTitle: 'Product Details',
+            headerBackTitle: 'Home',
             presentation: 'card',
           }}
         />

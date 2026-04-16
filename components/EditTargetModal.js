@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, Modal, StyleSheet, Pressable, TextInput } from 'react-native';
+import { View, Text, Modal, StyleSheet, Pressable, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import Button from './ui/Button';
 import { colors, spacing, typography, borderRadius } from '../constants/theme';
 
@@ -22,6 +22,7 @@ export default function EditTargetModal({ visible, currentTarget, currentPrice, 
 
   return (
     <Modal visible={visible} transparent animationType="slide">
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <View style={styles.overlay}>
         <View style={styles.modal}>
           <Text style={styles.label}>SET PRICE ALERT</Text>
@@ -48,6 +49,7 @@ export default function EditTargetModal({ visible, currentTarget, currentPrice, 
           </Pressable>
         </View>
       </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

@@ -32,12 +32,12 @@ export default function AddScreen() {
     try {
       const result = await extractProduct(url.trim());
       if (result.error || result.placeholder) {
-        setError(result.error || result.message || 'Could not extract product data');
+        setError("We couldn't fetch that item. Please check the URL and try again.");
       } else {
         setProduct(result);
       }
     } catch (e) {
-      setError(e.message || 'Failed to extract product data');
+      setError("We couldn't fetch that item. Please check the URL and try again.");
     } finally {
       setExtracting(false);
     }

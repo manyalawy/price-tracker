@@ -3,7 +3,7 @@ import { View, Text, Modal, StyleSheet, Pressable, TextInput } from 'react-nativ
 import Button from './ui/Button';
 import { colors, spacing, typography, borderRadius } from '../constants/theme';
 
-export default function EditTargetModal({ visible, currentTarget, currency, onSave, onClose }) {
+export default function EditTargetModal({ visible, currentTarget, currentPrice, currency, onSave, onClose }) {
   const [value, setValue] = useState(String(currentTarget || ''));
   const [error, setError] = useState('');
 
@@ -11,6 +11,10 @@ export default function EditTargetModal({ visible, currentTarget, currency, onSa
     const num = parseFloat(value);
     if (!num || num <= 0) {
       setError('Please enter a valid price');
+      return;
+    }
+    if (num >= currentPrice) {
+      setError('Target price must be lower than the current price');
       return;
     }
     onSave(num);

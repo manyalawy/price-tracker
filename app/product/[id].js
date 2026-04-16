@@ -117,6 +117,7 @@ export default function ProductDetailScreen() {
         <EditTargetModal
           visible={editModalVisible}
           currentTarget={product.target_price}
+          currentPrice={product.current_price}
           currency={product.currency}
           onSave={handleEditTarget}
           onClose={() => setEditModalVisible(false)}

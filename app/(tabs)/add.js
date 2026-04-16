@@ -55,6 +55,10 @@ export default function AddScreen() {
       setError('Please enter a valid target price');
       return;
     }
+    if (target >= product.price) {
+      setError('Target price must be lower than the current price');
+      return;
+    }
     setSaving(true);
     setError('');
 

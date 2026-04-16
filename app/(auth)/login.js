@@ -41,7 +41,7 @@ export default function LoginScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.logoSection}>
-          <Text style={styles.logo}>PriceTrack</Text>
+          <Text style={styles.logo}>Dipp</Text>
           <Text style={styles.logoSub}>Track prices, save money.</Text>
         </View>
 

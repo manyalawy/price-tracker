@@ -112,7 +112,7 @@ export default function SettingsScreen() {
                   <Ionicons name="information-circle" size={20} color={colors.textLabel} />
                 </View>
                 <Text style={styles.versionLabel}>Version</Text>
-                <Text style={styles.versionValue}>PriceTrack v1.0.0</Text>
+                <Text style={styles.versionValue}>Dipp v1.0.0</Text>
               </View>
             </View>
           </View>

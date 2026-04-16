@@ -112,7 +112,7 @@ export default function HomeScreen() {
         >
           <View style={styles.headerLeft}>
             <Ionicons name="pricetag" size={16} color={colors.accent} />
-            <Text style={styles.headerTitle}>PriceTrack</Text>
+            <Text style={styles.headerTitle}>Dipp</Text>
           </View>
           <Ionicons name="notifications-outline" size={22} color={colors.text} />
         </BlurView>

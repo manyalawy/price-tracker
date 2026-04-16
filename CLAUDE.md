@@ -1,4 +1,4 @@
-# CLAUDE.md — PriceTrack
+# CLAUDE.md — Dipp
 
 This file gives Claude Code full context on the project architecture, patterns, and rules. Read it before touching any code.
 
@@ -6,7 +6,7 @@ This file gives Claude Code full context on the project architecture, patterns, 
 
 ## 1. Project Overview
 
-PriceTrack is a React Native/Expo price tracking app. Users paste product URLs → an external extraction API scrapes name/image/price → data is stored in Supabase → push notifications are sent when the price drops below the user's target.
+Dipp is a React Native/Expo price tracking app. Users paste product URLs → an external extraction API scrapes name/image/price → data is stored in Supabase → push notifications are sent when the price drops below the user's target.
 
 - **Stack**: React Native 0.81 + Expo 54, Expo Router (file-based routing), Supabase (auth + database), Railway-hosted extraction API
 - **Testing**: Expo Go on a physical device (`npx expo start`, scan QR code)

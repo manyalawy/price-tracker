@@ -49,7 +49,7 @@ export default function SignUpScreen() {
       <View style={styles.container}>
         <View style={styles.successOuter}>
           <View style={styles.logoSection}>
-            <Text style={styles.logo}>PriceTrack</Text>
+            <Text style={styles.logo}>Dipp</Text>
             <Text style={styles.logoSub}>Track prices, save money.</Text>
           </View>
 
@@ -83,7 +83,7 @@ export default function SignUpScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.logoSection}>
-          <Text style={styles.logo}>PriceTrack</Text>
+          <Text style={styles.logo}>Dipp</Text>
           <Text style={styles.logoSub}>Track prices, save money.</Text>
         </View>
 

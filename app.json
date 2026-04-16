@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "PriceTrack",
-    "slug": "price-track",
+    "name": "Dipp",
+    "slug": "dipp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
-    "scheme": "pricetrack",
+    "scheme": "dipp",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -15,7 +15,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.pricetrack.app"
+      "bundleIdentifier": "com.dipp.app"
     },
     "android": {
       "adaptiveIcon": {
@@ -23,7 +23,7 @@
         "backgroundColor": "#0a0a0a"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.pricetrack.app"
+      "package": "com.dipp.app"
     },
     "web": {
       "favicon": "./assets/favicon.png"

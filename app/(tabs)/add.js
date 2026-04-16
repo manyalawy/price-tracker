@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import ProductPreview from '../../components/ProductPreview';
+import ReportURLModal from '../../components/ReportURLModal';
 import { extractProduct } from '../../lib/api';
 import { useProducts } from '../../contexts/ProductsContext';
 import { colors, spacing, typography, borderRadius } from '../../constants/theme';
@@ -18,6 +19,8 @@ export default function AddScreen() {
   const [saving, setSaving] = useState(false);
   const [product, setProduct] = useState(null);
   const [error, setError] = useState('');
+  const [extractFailed, setExtractFailed] = useState(false);
+  const [reportModalVisible, setReportModalVisible] = useState(false);
 
   const handleExtract = async () => {
     if (!url.trim()) {
@@ -27,17 +30,20 @@ export default function AddScreen() {
     Keyboard.dismiss();
     setExtracting(true);
     setError('');
+    setExtractFailed(false);
     setProduct(null);
 
     try {
       const result = await extractProduct(url.trim());
       if (result.error || result.placeholder) {
         setError("We couldn't fetch that item. Please check the URL and try again.");
+        setExtractFailed(true);
       } else {
         setProduct(result);
       }
     } catch (e) {
       setError("We couldn't fetch that item. Please check the URL and try again.");
+      setExtractFailed(true);
     } finally {
       setExtracting(false);
     }
@@ -127,6 +133,16 @@ export default function AddScreen() {
                 <Text style={styles.errorText}>{error}</Text>
               </View>
             ) : null}
+            {extractFailed ? (
+              <TouchableOpacity
+                style={styles.reportRow}
+                onPress={() => setReportModalVisible(true)}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="flag-outline" size={13} color={colors.textSecondary} />
+                <Text style={styles.reportText}>Report this URL</Text>
+              </TouchableOpacity>
+            ) : null}
           </View>
 
           {product && (
@@ -170,6 +186,11 @@ export default function AddScreen() {
 
         </ScrollView>
       </SafeAreaView>
+      <ReportURLModal
+        visible={reportModalVisible}
+        url={url}
+        onClose={() => setReportModalVisible(false)}
+      />
     </KeyboardAvoidingView>
   );
 }
@@ -259,6 +280,17 @@ const styles = StyleSheet.create({
     color: colors.dangerAlt,
     fontSize: typography.sizes.sm,
     flex: 1,
+  },
+  reportRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    marginTop: spacing.xs,
+  },
+  reportText: {
+    fontSize: typography.sizes.xs,
+    color: colors.textSecondary,
   },
   fetchedSection: {
     borderTopWidth: 1,

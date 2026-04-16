@@ -1,6 +1,5 @@
 import { View, Text, Image, StyleSheet } from 'react-native';
-import Card from './ui/Card';
-import { colors, spacing, typography } from '../constants/theme';
+import { colors, spacing, typography, borderRadius } from '../constants/theme';
 
 export default function ProductPreview({ product }) {
   if (!product) return null;
@@ -8,50 +7,87 @@ export default function ProductPreview({ product }) {
   const currency = product.currency === 'EUR' ? '€' : product.currency === 'GBP' ? '£' : '$';
 
   return (
-    <Card style={styles.card}>
+    <View style={styles.card}>
       {product.image_url && (
-        <Image source={{ uri: product.image_url }} style={styles.image} resizeMode="contain" />
+        <Image source={{ uri: product.image_url }} style={styles.image} resizeMode="cover" />
       )}
-      <Text style={styles.domain}>{product.domain}</Text>
-      <Text style={styles.name} numberOfLines={3}>{product.name}</Text>
-      <Text style={styles.price}>{currency}{product.price?.toFixed(2)}</Text>
-      <Text style={styles.method}>Extracted via {product.method}</Text>
-    </Card>
+      <View style={styles.content}>
+        <View style={styles.metaRow}>
+          <Text style={styles.domain}>{product.domain?.toUpperCase()}</Text>
+        </View>
+        <Text style={styles.name} numberOfLines={2}>{product.name}</Text>
+        <View style={styles.priceRow}>
+          <Text style={styles.price}>{currency}{product.price?.toFixed(2)}</Text>
+          <Text style={styles.currentLabel}>CURRENT</Text>
+        </View>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
+    backgroundColor: colors.cardAlt,
+    borderRadius: borderRadius.xl,
+    overflow: 'hidden',
     marginBottom: spacing.md,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 25 },
+    shadowOpacity: 0.25,
+    shadowRadius: 50,
+    elevation: 10,
   },
   image: {
     width: '100%',
-    height: 150,
-    borderRadius: 8,
-    marginBottom: spacing.md,
-    backgroundColor: colors.cardHover,
+    height: 192,
   },
-  domain: {
-    color: colors.textMuted,
-    fontSize: typography.sizes.xs,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: spacing.xs,
+  content: {
+    padding: spacing.lg,
   },
-  name: {
-    color: colors.text,
-    fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.semibold,
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: spacing.sm,
   },
-  price: {
-    color: colors.accent,
-    fontSize: typography.sizes.xxl,
-    fontWeight: typography.weights.bold,
-    marginBottom: spacing.xs,
+  domain: {
+    color: '#7ae6ff',
+    fontSize: 11,
+    letterSpacing: 1.1,
+    textTransform: 'uppercase',
   },
-  method: {
-    color: colors.textMuted,
-    fontSize: typography.sizes.xs,
+  methodBadge: {
+    backgroundColor: colors.accent + '1A',
+    borderRadius: borderRadius.full,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+  },
+  methodText: {
+    color: colors.accent,
+    fontSize: 10,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+  },
+  name: {
+    color: colors.textWarm,
+    fontSize: typography.sizes.xl,
+    marginBottom: spacing.md,
+  },
+  priceRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+  },
+  price: {
+    color: colors.textWarm,
+    fontSize: 30,
+    letterSpacing: -0.75,
+  },
+  currentLabel: {
+    color: colors.textLabel,
+    fontSize: 11,
+    letterSpacing: 1.1,
+    textTransform: 'uppercase',
+    marginLeft: spacing.sm,
+    marginBottom: 4,
   },
 });

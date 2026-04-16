@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { View, Text, TextInput, ScrollView, StyleSheet, Keyboard, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, ScrollView, StyleSheet, Keyboard, Alert, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import Button from '../../components/ui/Button';
 import ProductPreview from '../../components/ProductPreview';
 import { extractProduct } from '../../lib/api';
 import { useProducts } from '../../contexts/ProductsContext';
@@ -78,150 +79,259 @@ export default function AddScreen() {
     }
   };
 
+  const fetchDisabled = !url.trim() || extracting;
+  const trackDisabled = !targetPrice || saving;
+
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1, backgroundColor: colors.background }}>
-    <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.content} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-        <Text style={styles.title}>Add Product</Text>
-        <Text style={styles.subtitle}>Paste a product URL to start tracking</Text>
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.keyboardView}>
+      <SafeAreaView style={styles.container}>
+        <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
 
-        <View style={styles.urlRow}>
-          <Text style={styles.urlIcon}>🔗</Text>
-          <TextInput
-            style={styles.urlInput}
-            value={url}
-            onChangeText={setUrl}
-            placeholder="https://amazon.com/..."
-            placeholderTextColor={colors.textMuted}
-            autoCapitalize="none"
-            keyboardType="url"
-          />
-        </View>
+          <View style={styles.headingSection}>
+            <Text style={styles.title}>Add Product</Text>
+            <Text style={styles.subtitle}>Paste a product link to start tracking</Text>
+          </View>
 
-        <Button
-          title={extracting ? 'Extracting...' : 'Fetch Product'}
-          onPress={handleExtract}
-          loading={extracting}
-          disabled={!url.trim()}
-          style={styles.button}
-        />
-
-        {error ? <Text style={styles.error}>{error}</Text> : null}
-
-        {product && (
-          <>
-            <ProductPreview product={product} />
-
-            <Text style={styles.sectionLabel}>SET YOUR TARGET PRICE</Text>
-            <View style={styles.priceInputRow}>
-              <Text style={styles.currencyPrefix}>$</Text>
+          <View style={styles.urlSection}>
+            <View style={styles.urlInputWrapper}>
+              <View style={styles.urlIconContainer}>
+                <Ionicons name="link-outline" size={20} color={colors.textSecondary} />
+              </View>
               <TextInput
-                style={styles.priceInput}
-                value={targetPrice}
-                onChangeText={setTargetPrice}
-                placeholder="0.00"
-                placeholderTextColor={colors.textMuted}
-                keyboardType="decimal-pad"
+                style={styles.urlInput}
+                value={url}
+                onChangeText={setUrl}
+                placeholder="https://amazon.com/..."
+                placeholderTextColor="#767577"
+                autoCapitalize="none"
+                keyboardType="url"
               />
-              <Text style={styles.currencySuffix}>USD</Text>
             </View>
 
-            <Button
-              title="Start Tracking"
-              onPress={handleTrack}
-              loading={saving}
-              disabled={!targetPrice}
-            />
-          </>
-        )}
-      </ScrollView>
-    </SafeAreaView>
+            <TouchableOpacity onPress={handleExtract} disabled={fetchDisabled} activeOpacity={0.85}>
+              <LinearGradient
+                colors={['#3fff8b', '#13ea79']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={[styles.fetchButton, fetchDisabled && styles.buttonDisabled]}
+              >
+                <Text style={styles.fetchButtonText}>
+                  {extracting ? 'Fetching...' : 'Fetch Product'}
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+
+            {error ? (
+              <View style={styles.errorRow}>
+                <Ionicons name="alert-circle" size={15} color={colors.dangerAlt} />
+                <Text style={styles.errorText}>{error}</Text>
+              </View>
+            ) : null}
+          </View>
+
+          {product && (
+            <View style={styles.fetchedSection}>
+              <ProductPreview product={product} />
+
+              <View style={styles.targetPriceWrapper}>
+                <Text style={styles.targetLabel}>SET YOUR TARGET PRICE</Text>
+                <View style={styles.targetInputContainer}>
+                  <View style={styles.targetDollarContainer}>
+                    <Text style={styles.targetDollar}>$</Text>
+                  </View>
+                  <TextInput
+                    style={styles.targetInput}
+                    value={targetPrice}
+                    onChangeText={setTargetPrice}
+                    placeholder="0.00"
+                    placeholderTextColor={colors.textMuted}
+                    keyboardType="decimal-pad"
+                  />
+                  <View style={styles.targetUsdContainer}>
+                    <Text style={styles.targetUsd}>USD</Text>
+                  </View>
+                </View>
+              </View>
+
+              <TouchableOpacity onPress={handleTrack} disabled={trackDisabled} activeOpacity={0.85}>
+                <LinearGradient
+                  colors={['#3fff8b', '#13ea79']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={[styles.trackButton, trackDisabled && styles.buttonDisabled]}
+                >
+                  <Text style={styles.trackButtonText}>
+                    {saving ? 'Saving...' : 'Start Tracking'}
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          )}
+
+        </ScrollView>
+      </SafeAreaView>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
+  keyboardView: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
   container: {
     flex: 1,
     backgroundColor: colors.background,
   },
-  content: {
+  scroll: {
     flex: 1,
-    paddingHorizontal: spacing.md,
   },
   scrollContent: {
+    paddingHorizontal: spacing.lg,
     paddingBottom: 100,
   },
-  title: {
-    color: colors.text,
-    fontSize: typography.sizes.xxl,
-    fontWeight: typography.weights.bold,
+  headingSection: {
     marginTop: spacing.md,
+    marginBottom: spacing.xl,
+    gap: spacing.sm,
+  },
+  title: {
+    color: colors.textWarm,
+    fontSize: typography.sizes.display,
+    fontWeight: typography.weights.regular,
+    letterSpacing: -0.9,
   },
   subtitle: {
-    color: colors.textSecondary,
-    fontSize: typography.sizes.md,
-    marginBottom: spacing.lg,
-    marginTop: spacing.xs,
+    color: colors.textLabel,
+    fontSize: typography.sizes.lg,
   },
-  urlRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.inputBg,
-    borderRadius: borderRadius.md,
-    paddingHorizontal: spacing.md,
-    marginBottom: spacing.md,
+  urlSection: {
+    gap: spacing.lg,
+    marginBottom: spacing.xl,
   },
-  urlIcon: {
-    fontSize: 16,
-    marginRight: spacing.sm,
+  urlInputWrapper: {
+    height: 64,
+    backgroundColor: colors.iconBg,
+    borderRadius: borderRadius.full,
+    justifyContent: 'center',
+  },
+  urlIconContainer: {
+    position: 'absolute',
+    left: 20,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
   },
   urlInput: {
     flex: 1,
     color: colors.text,
-    fontSize: typography.sizes.md,
-    paddingVertical: spacing.md,
+    fontSize: typography.sizes.lg,
+    paddingLeft: 56,
+    paddingRight: spacing.lg,
+    height: '100%',
   },
-  error: {
-    color: colors.danger,
-    fontSize: typography.sizes.sm,
-    marginBottom: spacing.md,
-  },
-  button: {
-    marginBottom: spacing.lg,
-  },
-  sectionLabel: {
-    color: colors.textMuted,
-    fontSize: typography.sizes.xs,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginBottom: spacing.sm,
-    marginTop: spacing.md,
-  },
-  priceInputRow: {
-    flexDirection: 'row',
+  fetchButton: {
+    height: 56,
+    borderRadius: borderRadius.full,
     alignItems: 'center',
-    backgroundColor: colors.inputBg,
-    borderRadius: borderRadius.md,
-    paddingHorizontal: spacing.md,
-    marginBottom: spacing.md,
+    justifyContent: 'center',
+    shadowColor: colors.accent,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.2,
+    shadowRadius: 20,
+    elevation: 8,
   },
-  currencyPrefix: {
-    color: colors.textSecondary,
-    fontSize: typography.sizes.xl,
-    marginRight: spacing.xs,
+  fetchButtonText: {
+    color: colors.accentText,
+    fontSize: typography.sizes.lg,
+    fontWeight: typography.weights.medium,
   },
-  priceInput: {
-    flex: 1,
-    color: colors.text,
-    fontSize: typography.sizes.xl,
-    fontWeight: '600',
-    paddingVertical: spacing.md,
+  buttonDisabled: {
+    opacity: 0.5,
   },
-  currencySuffix: {
-    color: colors.textMuted,
+  errorRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.sm,
+  },
+  errorText: {
+    color: colors.dangerAlt,
     fontSize: typography.sizes.sm,
-    marginLeft: spacing.xs,
+    flex: 1,
+  },
+  fetchedSection: {
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(72,71,74,0.1)',
+    paddingTop: 17,
+    gap: spacing.xl,
+  },
+  targetPriceWrapper: {
+    gap: spacing.sm,
+  },
+  targetLabel: {
+    color: colors.textLabel,
+    fontSize: 11,
+    letterSpacing: 1.1,
+    textTransform: 'uppercase',
+    paddingHorizontal: spacing.xs,
+  },
+  targetInputContainer: {
+    height: 80,
+    backgroundColor: colors.groupBg,
+    borderRadius: borderRadius.xl,
+    borderWidth: 1,
+    borderColor: 'rgba(72,71,74,0.2)',
+    overflow: 'hidden',
+    justifyContent: 'center',
+  },
+  targetDollarContainer: {
+    position: 'absolute',
+    left: 24,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
+  },
+  targetDollar: {
+    color: colors.accent,
+    fontSize: typography.sizes.xxl,
+  },
+  targetInput: {
+    flex: 1,
+    color: colors.textMuted,
+    fontSize: typography.sizes.display,
+    letterSpacing: -0.9,
+    paddingLeft: 48,
+    paddingRight: 64,
+    height: '100%',
+  },
+  targetUsdContainer: {
+    position: 'absolute',
+    right: 24,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
+  },
+  targetUsd: {
+    color: 'rgba(63,255,139,0.4)',
+    fontSize: typography.sizes.sm,
+    letterSpacing: 1.4,
+    textTransform: 'uppercase',
+  },
+  trackButton: {
+    height: 64,
+    borderRadius: borderRadius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: colors.accent,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 40,
+    elevation: 8,
+  },
+  trackButtonText: {
+    color: colors.accentText,
+    fontSize: typography.sizes.xl,
+    fontWeight: typography.weights.medium,
   },
 });

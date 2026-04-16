@@ -142,8 +142,8 @@ const styles = StyleSheet.create({
   },
   title: {
     color: colors.textWarm,
-    fontSize: 36,
-    fontWeight: typography.weights.bold,
+    fontSize: typography.sizes.display,
+    fontWeight: typography.weights.regular,
     letterSpacing: -1.8,
     marginBottom: 48,
   },

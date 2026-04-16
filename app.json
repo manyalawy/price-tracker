@@ -30,6 +30,13 @@
     },
     "plugins": [
       "expo-router"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "f4caee52-6c92-4549-89b2-676bfd4edd90"
+      }
+    },
+    "owner": "manyalawy"
   }
 }

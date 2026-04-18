@@ -48,11 +48,28 @@ export function AuthProvider({ children }) {
   };
 
   const createSessionFromUrl = async (url) => {
+    // PKCE flow: code in query params
     const parsed = Linking.parse(url);
     const code = parsed.queryParams?.code;
-    if (!code) return;
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (error) throw error;
+    if (code) {
+      const { error } = await supabase.auth.exchangeCodeForSession(code);
+      if (error) throw error;
+      return;
+    }
+
+    // Implicit flow: tokens in URL hash fragment
+    const hash = url.split('#')[1];
+    if (hash) {
+      const params = Object.fromEntries(hash.split('&').map(p => p.split('=')));
+      const { access_token, refresh_token } = params;
+      if (access_token) {
+        const { error } = await supabase.auth.setSession({ access_token, refresh_token });
+        if (error) throw error;
+        return;
+      }
+    }
+
+    throw new Error('Unable to complete sign-in. Please try again.');
   };
 
   const signInWithOAuth = async (provider) => {

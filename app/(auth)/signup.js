@@ -16,7 +16,7 @@ export default function SignUpScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  const [socialLoading, setSocialLoading] = useState(false);
+  const [socialLoadingProvider, setSocialLoadingProvider] = useState(null);
 
   const handleSignUp = async () => {
     if (!email || !password || !confirmPassword) {
@@ -48,24 +48,24 @@ export default function SignUpScreen() {
   };
 
   const handleGoogle = async () => {
-    setSocialLoading(true);
+    setSocialLoadingProvider('google');
     try {
       await signInWithGoogle();
     } catch (e) {
       Alert.alert('Sign Up Failed', parseError(e));
     } finally {
-      setSocialLoading(false);
+      setSocialLoadingProvider(null);
     }
   };
 
   const handleApple = async () => {
-    setSocialLoading(true);
+    setSocialLoadingProvider('apple');
     try {
       await signInWithApple();
     } catch (e) {
       Alert.alert('Sign Up Failed', parseError(e));
     } finally {
-      setSocialLoading(false);
+      setSocialLoadingProvider(null);
     }
   };
 
@@ -154,7 +154,7 @@ export default function SignUpScreen() {
           <SocialAuthButtons
             onGoogle={handleGoogle}
             onApple={handleApple}
-            loading={socialLoading}
+            loadingProvider={socialLoadingProvider}
           />
         </View>
       </ScrollView>

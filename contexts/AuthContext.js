@@ -62,7 +62,7 @@ export function AuthProvider({ children }) {
       options: { redirectTo, skipBrowserRedirect: true },
     });
     if (error) throw error;
-    if (!data?.url) return;
+    if (!data?.url) throw new Error('OAuth sign-in is not available. Please try again later.');
     const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
     if (result.type === 'success' && result.url) {
       await createSessionFromUrl(result.url);

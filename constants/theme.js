@@ -9,6 +9,7 @@ export const colors = {
   accentDark: '#2ecc71',
   accentGradientEnd: '#13ea79',
   accentText: '#005d2c',
+  accentThumb: '#004f24',
   danger: '#f87171',
   dangerDark: '#ef4444',
   dangerAlt: '#ff716c',

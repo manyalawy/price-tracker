@@ -5,24 +5,27 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { colors, spacing, typography, borderRadius } from '../../constants/theme';
+import { parseError } from '../../lib/errorHandler';
 
 export default function SettingsScreen() {
   const { user, signOut } = useAuth();
   const [emailNotifs, setEmailNotifs] = useState(true);
   const [pushNotifs, setPushNotifs] = useState(true);
-  const [loading, setLoading] = useState(false);
-
   useEffect(() => {
     loadProfile();
   }, []);
 
   const loadProfile = async () => {
     if (!user) return;
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('profiles')
       .select('email_notifications, push_notifications')
       .eq('id', user.id)
       .single();
+    if (error) {
+      Alert.alert('Error', parseError(error));
+      return;
+    }
     if (data) {
       setEmailNotifs(data.email_notifications ?? true);
       setPushNotifs(data.push_notifications ?? true);
@@ -31,18 +34,26 @@ export default function SettingsScreen() {
 
   const toggleEmailNotifs = async (value) => {
     setEmailNotifs(value);
-    await supabase
+    const { error } = await supabase
       .from('profiles')
       .update({ email_notifications: value, updated_at: new Date().toISOString() })
       .eq('id', user.id);
+    if (error) {
+      setEmailNotifs(!value);
+      Alert.alert('Error', parseError(error));
+    }
   };
 
   const togglePushNotifs = async (value) => {
     setPushNotifs(value);
-    await supabase
+    const { error } = await supabase
       .from('profiles')
       .update({ push_notifications: value, updated_at: new Date().toISOString() })
       .eq('id', user.id);
+    if (error) {
+      setPushNotifs(!value);
+      Alert.alert('Error', parseError(error));
+    }
   };
 
   const handleSignOut = () => {
@@ -91,8 +102,8 @@ export default function SettingsScreen() {
                 <Switch
                   value={emailNotifs}
                   onValueChange={toggleEmailNotifs}
-                  trackColor={{ false: colors.border, true: '#13ea79' }}
-                  thumbColor={emailNotifs ? '#004f24' : '#ffffff'}
+                  trackColor={{ false: colors.border, true: colors.accentGradientEnd }}
+                  thumbColor={emailNotifs ? colors.accentThumb : colors.text}
                   ios_backgroundColor={colors.border}
                 />
               </View>
@@ -104,8 +115,8 @@ export default function SettingsScreen() {
                 <Switch
                   value={pushNotifs}
                   onValueChange={togglePushNotifs}
-                  trackColor={{ false: colors.border, true: '#13ea79' }}
-                  thumbColor={pushNotifs ? '#004f24' : '#ffffff'}
+                  trackColor={{ false: colors.border, true: colors.accentGradientEnd }}
+                  thumbColor={pushNotifs ? colors.accentThumb : colors.text}
                   ios_backgroundColor={colors.border}
                 />
               </View>

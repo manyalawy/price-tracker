@@ -1,17 +1,20 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Alert } from 'react-native';
 import { Link } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import { colors, spacing, typography } from '../../constants/theme';
+import SocialAuthButtons from '../../components/SocialAuthButtons';
+import { parseError } from '../../lib/errorHandler';
 
 export default function LoginScreen() {
-  const { signIn } = useAuth();
+  const { signIn, signInWithGoogle, signInWithApple } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [socialLoading, setSocialLoading] = useState(false);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -27,6 +30,28 @@ export default function LoginScreen() {
       setError('An unexpected error occurred');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogle = async () => {
+    setSocialLoading(true);
+    try {
+      await signInWithGoogle();
+    } catch (e) {
+      Alert.alert('Sign In Failed', parseError(e));
+    } finally {
+      setSocialLoading(false);
+    }
+  };
+
+  const handleApple = async () => {
+    setSocialLoading(true);
+    try {
+      await signInWithApple();
+    } catch (e) {
+      Alert.alert('Sign In Failed', parseError(e));
+    } finally {
+      setSocialLoading(false);
     }
   };
 
@@ -79,6 +104,11 @@ export default function LoginScreen() {
           <Link href="/(auth)/signup" style={styles.link}>
             <Text style={styles.linkText}>New here? Create account</Text>
           </Link>
+          <SocialAuthButtons
+            onGoogle={handleGoogle}
+            onApple={handleApple}
+            loading={socialLoading}
+          />
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

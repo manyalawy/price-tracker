@@ -37,7 +37,7 @@ export default function SocialAuthButtons({ onGoogle, onApple, loadingProvider =
           <ActivityIndicator size="small" color={colors.text} />
         ) : (
           <>
-            <AntDesign name="apple1" size={18} color={colors.text} style={styles.icon} />
+            <AntDesign name="apple" size={18} color={colors.text} style={styles.icon} />
             <Text style={styles.buttonText}>Continue with Apple</Text>
           </>
         )}

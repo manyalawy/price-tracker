@@ -9,7 +9,7 @@ import { colors, spacing, typography, borderRadius } from '../../constants/theme
 export default function SettingsScreen() {
   const { user, signOut } = useAuth();
   const [emailNotifs, setEmailNotifs] = useState(true);
-  const [pushEnabled, setPushEnabled] = useState(true);
+  const [pushNotifs, setPushNotifs] = useState(true);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -20,12 +20,12 @@ export default function SettingsScreen() {
     if (!user) return;
     const { data } = await supabase
       .from('profiles')
-      .select('email_notifications, expo_push_token')
+      .select('email_notifications, push_notifications')
       .eq('id', user.id)
       .single();
     if (data) {
       setEmailNotifs(data.email_notifications ?? true);
-      setPushEnabled(!!data.expo_push_token);
+      setPushNotifs(data.push_notifications ?? true);
     }
   };
 
@@ -34,6 +34,14 @@ export default function SettingsScreen() {
     await supabase
       .from('profiles')
       .update({ email_notifications: value, updated_at: new Date().toISOString() })
+      .eq('id', user.id);
+  };
+
+  const togglePushNotifs = async (value) => {
+    setPushNotifs(value);
+    await supabase
+      .from('profiles')
+      .update({ push_notifications: value, updated_at: new Date().toISOString() })
       .eq('id', user.id);
   };
 
@@ -91,14 +99,15 @@ export default function SettingsScreen() {
               <View style={styles.notifRow}>
                 <View style={styles.rowLeft}>
                   <Text style={styles.rowLabel}>Push Notifications</Text>
-                  <Text style={styles.rowDesc}>{pushEnabled ? 'Enabled' : 'Not registered'}</Text>
+                  <Text style={styles.rowDesc}>Get price drop alerts on your device</Text>
                 </View>
-                <View style={styles.statusBadge}>
-                  <View style={[styles.statusDot, !pushEnabled && styles.statusDotInactive]} />
-                  <Text style={[styles.statusText, !pushEnabled && styles.statusTextInactive]}>
-                    {pushEnabled ? 'ACTIVE' : 'INACTIVE'}
-                  </Text>
-                </View>
+                <Switch
+                  value={pushNotifs}
+                  onValueChange={togglePushNotifs}
+                  trackColor={{ false: colors.border, true: '#13ea79' }}
+                  thumbColor={pushNotifs ? '#004f24' : '#ffffff'}
+                  ios_backgroundColor={colors.border}
+                />
               </View>
             </View>
           </View>
@@ -222,30 +231,6 @@ const styles = StyleSheet.create({
   rowDesc: {
     color: colors.textLabel,
     fontSize: typography.sizes.xs,
-  },
-  statusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  statusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.accent,
-  },
-  statusDotInactive: {
-    backgroundColor: colors.textLabel,
-  },
-  statusText: {
-    color: colors.accent,
-    fontSize: 10,
-    fontWeight: typography.weights.bold,
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-  },
-  statusTextInactive: {
-    color: colors.textLabel,
   },
   versionRow: {
     flexDirection: 'row',

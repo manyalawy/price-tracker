@@ -115,6 +115,7 @@ colors.accent        // '#3fff8b'  neon green — primary action color
 colors.accentDark    // '#2ecc71'  darker accent variant
 colors.accentGradientEnd // '#13ea79'  LinearGradient end color
 colors.accentText    // '#005d2c'  dark green text on accent/gradient backgrounds
+colors.accentThumb   // '#004f24'  dark green thumb for Switch on accent track
 colors.danger        // '#f87171'  error/destructive
 colors.dangerDark    // '#ef4444'  darker danger variant
 colors.dangerAlt     // '#ff716c'  alternate danger

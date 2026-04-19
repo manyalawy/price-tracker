@@ -3,9 +3,9 @@ import { colors } from '../../constants/theme';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function AuthLayout() {
-  const { session } = useAuth();
+  const { session, isPasswordRecovery } = useAuth();
 
-  if (session) {
+  if (session && !isPasswordRecovery) {
     return <Redirect href="/(tabs)/" />;
   }
 

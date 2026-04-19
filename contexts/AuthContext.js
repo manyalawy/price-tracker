@@ -1,27 +1,48 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import * as WebBrowser from 'expo-web-browser';
 import * as Linking from 'expo-linking';
 
 const AuthContext = createContext({});
 
+function isRecoveryUrl(url) {
+  if (!url) return false;
+  const parsed = Linking.parse(url);
+  return !!parsed.queryParams?.code || url.includes('#access_token=');
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    const init = async () => {
+      // Check for a recovery deep link before setting loading=false so the auth
+      // guard doesn't redirect to login while the token exchange is in flight.
+      const [initialUrl, { data: { session: initialSession } }] = await Promise.all([
+        Linking.getInitialURL(),
+        supabase.auth.getSession(),
+      ]);
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (isRecoveryUrl(initialUrl)) {
+        setIsPasswordRecovery(true);
+      }
+
+      setSession(initialSession);
+      setUser(initialSession?.user ?? null);
+      setLoading(false);
+    };
+
+    init();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
+      if (event === 'PASSWORD_RECOVERY') {
+        setIsPasswordRecovery(true);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -43,7 +64,9 @@ export function AuthProvider({ children }) {
   };
 
   const resetPassword = async (email) => {
-    const result = await supabase.auth.resetPasswordForEmail(email);
+    const result = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: Linking.createURL('update-password'),
+    });
     return result;
   };
 
@@ -58,8 +81,7 @@ export function AuthProvider({ children }) {
     await supabase.auth.signOut();
   };
 
-  const createSessionFromUrl = async (url) => {
-    // PKCE flow: code in query params
+  const createSessionFromUrl = useCallback(async (url) => {
     const parsed = Linking.parse(url);
     const code = parsed.queryParams?.code;
     if (code) {
@@ -68,7 +90,6 @@ export function AuthProvider({ children }) {
       return;
     }
 
-    // Implicit flow: tokens in URL hash fragment
     const hash = url.split('#')[1];
     if (hash) {
       const params = Object.fromEntries(hash.split('&').map(p => p.split('=')));
@@ -81,7 +102,21 @@ export function AuthProvider({ children }) {
     }
 
     throw new Error('Unable to complete sign-in. Please try again.');
-  };
+  }, []);
+
+  // Handles a foreground deep link: guards against non-recovery URLs, sets state,
+  // and exchanges the token. Called from _layout.js via Linking.addEventListener.
+  const handleDeepLink = useCallback(async (url) => {
+    if (!isRecoveryUrl(url)) return;
+    setIsPasswordRecovery(true);
+    try {
+      await createSessionFromUrl(url);
+    } catch {
+      setIsPasswordRecovery(false);
+    }
+  }, [createSessionFromUrl]);
+
+  const clearPasswordRecovery = useCallback(() => setIsPasswordRecovery(false), []);
 
   const signInWithOAuth = async (provider) => {
     const redirectTo = 'dipp://auth/callback';
@@ -105,7 +140,7 @@ export function AuthProvider({ children }) {
   const signInWithApple = () => signInWithOAuth('apple');
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut, resetPassword, updatePassword, deleteAccount, signInWithGoogle, signInWithApple }}>
+    <AuthContext.Provider value={{ user, session, loading, isPasswordRecovery, clearPasswordRecovery, handleDeepLink, signUp, signIn, signOut, resetPassword, updatePassword, deleteAccount, signInWithGoogle, signInWithApple }}>
       {children}
     </AuthContext.Provider>
   );

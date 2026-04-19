@@ -8,7 +8,7 @@ import Button from '../../components/ui/Button';
 import { colors, spacing, typography } from '../../constants/theme';
 
 export default function UpdatePasswordScreen() {
-  const { updatePassword } = useAuth();
+  const { updatePassword, clearPasswordRecovery } = useAuth();
   const router = useRouter();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -35,6 +35,7 @@ export default function UpdatePasswordScreen() {
       if (authError) {
         setError(parseError(authError));
       } else {
+        clearPasswordRecovery();
         router.replace('/(tabs)');
       }
     } catch {

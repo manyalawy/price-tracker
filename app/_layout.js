@@ -2,13 +2,14 @@ import { useEffect, useRef } from 'react';
 import { Redirect, Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import * as Linking from 'expo-linking';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { ProductsProvider } from '../contexts/ProductsContext';
 import { registerForPushNotifications, setupNotificationResponseHandler } from '../lib/notifications';
 import { colors } from '../constants/theme';
 
 function RootLayoutNav() {
-  const { user, session, loading } = useAuth();
+  const { user, session, loading, isPasswordRecovery, handleDeepLink } = useAuth();
   const router = useRouter();
   const notifListenerRef = useRef(null);
 
@@ -23,6 +24,11 @@ function RootLayoutNav() {
     return () => notifListenerRef.current?.remove();
   }, [router]);
 
+  useEffect(() => {
+    const sub = Linking.addEventListener('url', ({ url }) => handleDeepLink(url));
+    return () => sub.remove();
+  }, [handleDeepLink]);
+
   if (loading) {
     return (
       <View style={styles.loading}>
@@ -34,7 +40,7 @@ function RootLayoutNav() {
   return (
     <>
       <StatusBar style="light" />
-      {!session && <Redirect href="/(auth)/login" />}
+      {!session && !isPasswordRecovery && <Redirect href="/(auth)/login" />}
       <Stack
         screenOptions={{
           headerShown: false,

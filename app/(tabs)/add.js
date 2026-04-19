@@ -13,7 +13,7 @@ import { colors, spacing, typography, borderRadius } from '../../constants/theme
 
 export default function AddScreen() {
   const router = useRouter();
-  const { addProduct } = useProducts();
+  const { addProduct, products } = useProducts();
   const [url, setUrl] = useState('');
   const [targetPrice, setTargetPrice] = useState('');
   const [extracting, setExtracting] = useState(false);
@@ -51,6 +51,10 @@ export default function AddScreen() {
   };
 
   const handleTrack = async () => {
+    if (products.length >= 10) {
+      setError("You've reached the 10-product limit. Remove a product to add a new one.");
+      return;
+    }
     const target = parseFloat(targetPrice);
     if (!target || target <= 0) {
       setError('Please enter a valid target price');

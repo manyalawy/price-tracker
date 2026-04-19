@@ -56,6 +56,9 @@ export function ProductsProvider({ children }) {
 
   const addProduct = async (productData) => {
     if (!user) throw new Error('You must be signed in to track a product');
+    if (state.products.length >= 10) {
+      throw new Error("You've reached the 10-product limit. Remove a product to add a new one.");
+    }
     const { data, error } = await supabase
       .from('products')
       .insert({

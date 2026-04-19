@@ -10,6 +10,7 @@ import { extractProduct } from '../../lib/api';
 import { useProducts } from '../../contexts/ProductsContext';
 import { parseError } from '../../lib/errorHandler';
 import { colors, spacing, typography, borderRadius } from '../../constants/theme';
+import AppHeader from '../../components/ui/AppHeader';
 
 export default function AddScreen() {
   const router = useRouter();
@@ -98,8 +99,10 @@ export default function AddScreen() {
   const trackDisabled = !targetPrice || saving;
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.keyboardView}>
-      <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+      <AppHeader />
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.flex}>
+        <SafeAreaView edges={['bottom']} style={styles.flex}>
         <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
 
           <View style={styles.headingSection}>
@@ -191,20 +194,20 @@ export default function AddScreen() {
           )}
 
         </ScrollView>
-      </SafeAreaView>
+        </SafeAreaView>
+      </KeyboardAvoidingView>
       <ReportURLModal
         visible={reportModalVisible}
         url={url}
         onClose={() => setReportModalVisible(false)}
       />
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  keyboardView: {
+  flex: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   container: {
     flex: 1,

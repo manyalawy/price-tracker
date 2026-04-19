@@ -18,7 +18,7 @@ export default function AppHeader() {
             paddingTop: insets.top + spacing.md,
             paddingBottom: spacing.md,
             paddingHorizontal: spacing.lg,
-            backgroundColor: 'rgba(14,14,16,0.8)',
+            backgroundColor: colors.background + 'cc',
           },
         ]}
       >

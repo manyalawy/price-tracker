@@ -1,9 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { View, Text, FlatList, RefreshControl, StyleSheet } from 'react-native';
-import { BlurView } from 'expo-blur';
-import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../contexts/AuthContext';
+import AppHeader from '../../components/ui/AppHeader';
 import { useProducts } from '../../contexts/ProductsContext';
 import ProductCard from '../../components/ProductCard';
 import SearchBar from '../../components/SearchBar';
@@ -17,7 +15,6 @@ export default function HomeScreen() {
   const [search, setSearch] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const router = useRouter();
-  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     fetchProducts();
@@ -96,26 +93,7 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <View>
-        <BlurView
-          intensity={30}
-          tint="dark"
-          style={[
-            styles.header,
-            {
-              paddingTop: insets.top + spacing.md,
-              paddingBottom: spacing.md,
-              paddingHorizontal: spacing.lg,
-              backgroundColor: 'rgba(14,14,16,0.8)',
-            },
-          ]}
-        >
-          <View style={styles.headerLeft}>
-            <Ionicons name="pricetag" size={16} color={colors.accent} />
-            <Text style={styles.headerTitle}>Dipp</Text>
-          </View>
-        </BlurView>
-      </View>
+      <AppHeader />
 
       <FlatList
         data={filtered}
@@ -141,21 +119,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  headerTitle: {
-    fontSize: typography.sizes.xl,
-    color: colors.accent,
-    letterSpacing: -1,
-    fontWeight: typography.weights.regular,
   },
   listContent: {
     paddingHorizontal: spacing.lg,

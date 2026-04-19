@@ -361,8 +361,8 @@ const styles = StyleSheet.create({
   },
   deleteAccountText: {
     color: colors.danger,
-    fontSize: typography.sizes.sm,
-    fontWeight: typography.weights.medium,
+    fontSize: typography.sizes.md,
+    fontWeight: typography.weights.semibold,
   },
   divider: {
     height: 1,

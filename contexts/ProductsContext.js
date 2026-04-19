@@ -39,7 +39,6 @@ export function ProductsProvider({ children }) {
   const fetchProducts = useCallback(async () => {
     if (!user) return;
     dispatch({ type: 'SET_LOADING' });
-    let isMounted = true;
     try {
       const { data, error } = await supabase
         .from('products')
@@ -49,11 +48,10 @@ export function ProductsProvider({ children }) {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      if (isMounted) dispatch({ type: 'SET_PRODUCTS', payload: data || [] });
+      dispatch({ type: 'SET_PRODUCTS', payload: data || [] });
     } catch (err) {
-      if (isMounted) dispatch({ type: 'SET_ERROR', payload: err.message });
+      dispatch({ type: 'SET_ERROR', payload: err.message });
     }
-    return () => { isMounted = false; };
   }, [user]);
 
   const addProduct = async (productData) => {
@@ -91,6 +89,7 @@ export function ProductsProvider({ children }) {
   };
 
   const deleteProduct = async (productId) => {
+    if (!user) throw new Error('You must be signed in to delete a product');
     const { error } = await supabase
       .from('products')
       .update({ is_active: false, updated_at: new Date().toISOString() })
@@ -102,6 +101,7 @@ export function ProductsProvider({ children }) {
   };
 
   const updateTargetPrice = async (productId, newTarget) => {
+    if (!user) throw new Error('You must be signed in to update a product');
     const { error } = await supabase
       .from('products')
       .update({ target_price: newTarget, updated_at: new Date().toISOString() })

@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Alert } from 'react-native';
-import { Link } from 'expo-router';
+import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Alert, Pressable } from 'react-native';
+import { Link, useRouter } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
@@ -10,6 +10,7 @@ import { parseError } from '../../lib/errorHandler';
 
 export default function SignUpScreen() {
   const { signUp, signInWithGoogle, signInWithApple } = useAuth();
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -36,7 +37,7 @@ export default function SignUpScreen() {
     try {
       const { error: authError } = await signUp(email, password);
       if (authError) {
-        setError(authError.message);
+        setError(parseError(authError));
       } else {
         setSuccess(true);
       }
@@ -156,6 +157,17 @@ export default function SignUpScreen() {
             onApple={handleApple}
             loadingProvider={socialLoadingProvider}
           />
+
+          <View style={styles.legalNote}>
+            <Text style={styles.legalText}>By signing up, you agree to our </Text>
+            <Pressable onPress={() => router.push('/terms')}>
+              <Text style={styles.legalLink}>Terms of Service</Text>
+            </Pressable>
+            <Text style={styles.legalText}> and </Text>
+            <Pressable onPress={() => router.push('/privacy-policy')}>
+              <Text style={styles.legalLink}>Privacy Policy</Text>
+            </Pressable>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -258,5 +270,21 @@ const styles = StyleSheet.create({
     color: colors.accent,
     fontSize: typography.sizes.sm,
     textAlign: 'center',
+  },
+  legalNote: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: spacing.md,
+  },
+  legalText: {
+    color: colors.textMuted,
+    fontSize: typography.sizes.xs,
+  },
+  legalLink: {
+    color: colors.textSecondary,
+    fontSize: typography.sizes.xs,
+    textDecorationLine: 'underline',
   },
 });

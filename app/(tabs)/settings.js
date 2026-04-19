@@ -13,7 +13,7 @@ export default function SettingsScreen() {
   const [pushNotifs, setPushNotifs] = useState(true);
   useEffect(() => {
     loadProfile();
-  }, []);
+  }, [user]);
 
   const loadProfile = async () => {
     if (!user) return;

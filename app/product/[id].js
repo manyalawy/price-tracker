@@ -50,7 +50,7 @@ export default function ProductDetailScreen() {
         <View style={styles.priceRow}>
           <Text style={styles.price}>{product.current_price?.toFixed(2)} {product.currency}</Text>
           <Text style={styles.statusBadge}>
-            {product.current_price <= product.target_price ? 'TARGET HIT' : 'ON'}
+            {product.current_price != null && product.target_price != null && product.current_price <= product.target_price ? 'TARGET HIT' : 'ON'}
           </Text>
         </View>
 

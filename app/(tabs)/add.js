@@ -8,6 +8,7 @@ import ProductPreview from '../../components/ProductPreview';
 import ReportURLModal from '../../components/ReportURLModal';
 import { extractProduct } from '../../lib/api';
 import { useProducts } from '../../contexts/ProductsContext';
+import { parseError } from '../../lib/errorHandler';
 import { colors, spacing, typography, borderRadius } from '../../constants/theme';
 
 export default function AddScreen() {
@@ -83,7 +84,7 @@ export default function AddScreen() {
         }},
       ]);
     } catch (e) {
-      setError(e.message || 'Failed to save product');
+      setError(parseError(e));
     } finally {
       setSaving(false);
     }

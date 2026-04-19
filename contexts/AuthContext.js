@@ -47,6 +47,11 @@ export function AuthProvider({ children }) {
     return result;
   };
 
+  const updatePassword = async (newPassword) => {
+    const result = await supabase.auth.updateUser({ password: newPassword });
+    return result;
+  };
+
   const createSessionFromUrl = async (url) => {
     // PKCE flow: code in query params
     const parsed = Linking.parse(url);
@@ -82,7 +87,11 @@ export function AuthProvider({ children }) {
     if (!data?.url) throw new Error('OAuth sign-in is not available. Please try again later.');
     const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
     if (result.type === 'success' && result.url) {
-      await createSessionFromUrl(result.url);
+      try {
+        await createSessionFromUrl(result.url);
+      } catch {
+        throw new Error('Failed to complete sign-in. Please try again.');
+      }
     }
   };
 
@@ -90,7 +99,7 @@ export function AuthProvider({ children }) {
   const signInWithApple = () => signInWithOAuth('apple');
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut, resetPassword, signInWithGoogle, signInWithApple }}>
+    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut, resetPassword, updatePassword, signInWithGoogle, signInWithApple }}>
       {children}
     </AuthContext.Provider>
   );

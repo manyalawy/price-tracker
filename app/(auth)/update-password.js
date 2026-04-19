@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View, Text, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
+import { parseError } from '../../lib/errorHandler';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import { colors, spacing, typography } from '../../constants/theme';
@@ -32,7 +33,7 @@ export default function UpdatePasswordScreen() {
     try {
       const { error: authError } = await updatePassword(password);
       if (authError) {
-        setError(authError.message);
+        setError(parseError(authError));
       } else {
         router.replace('/(tabs)');
       }

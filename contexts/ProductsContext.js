@@ -39,6 +39,7 @@ export function ProductsProvider({ children }) {
   const fetchProducts = useCallback(async () => {
     if (!user) return;
     dispatch({ type: 'SET_LOADING' });
+    let isMounted = true;
     try {
       const { data, error } = await supabase
         .from('products')
@@ -48,10 +49,11 @@ export function ProductsProvider({ children }) {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      dispatch({ type: 'SET_PRODUCTS', payload: data || [] });
+      if (isMounted) dispatch({ type: 'SET_PRODUCTS', payload: data || [] });
     } catch (err) {
-      dispatch({ type: 'SET_ERROR', payload: err.message });
+      if (isMounted) dispatch({ type: 'SET_ERROR', payload: err.message });
     }
+    return () => { isMounted = false; };
   }, [user]);
 
   const addProduct = async (productData) => {
@@ -92,7 +94,8 @@ export function ProductsProvider({ children }) {
     const { error } = await supabase
       .from('products')
       .update({ is_active: false, updated_at: new Date().toISOString() })
-      .eq('id', productId);
+      .eq('id', productId)
+      .eq('user_id', user.id);
 
     if (error) throw error;
     dispatch({ type: 'REMOVE_PRODUCT', payload: productId });
@@ -102,7 +105,8 @@ export function ProductsProvider({ children }) {
     const { error } = await supabase
       .from('products')
       .update({ target_price: newTarget, updated_at: new Date().toISOString() })
-      .eq('id', productId);
+      .eq('id', productId)
+      .eq('user_id', user.id);
 
     if (error) throw error;
     dispatch({ type: 'UPDATE_PRODUCT', payload: { id: productId, target_price: newTarget } });

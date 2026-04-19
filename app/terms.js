@@ -1,17 +1,18 @@
 import { ScrollView, Text, StyleSheet, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, typography } from '../constants/theme';
 
 export default function TermsScreen() {
   const router = useRouter();
+  const { from } = useLocalSearchParams();
 
   return (
     <SafeAreaView style={styles.container}>
       <Pressable onPress={() => router.back()} style={styles.backButton}>
         <Ionicons name="chevron-back" size={24} color={colors.text} />
-        <Text style={styles.backText}>Settings</Text>
+        <Text style={styles.backText}>{from === 'signup' ? 'Sign Up' : 'Settings'}</Text>
       </Pressable>
       <ScrollView
         style={styles.scroll}

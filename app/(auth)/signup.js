@@ -160,11 +160,11 @@ export default function SignUpScreen() {
 
           <View style={styles.legalNote}>
             <Text style={styles.legalText}>By signing up, you agree to our </Text>
-            <Pressable onPress={() => router.push('/terms')}>
+            <Pressable onPress={() => router.push('/terms?from=signup')}>
               <Text style={styles.legalLink}>Terms of Service</Text>
             </Pressable>
             <Text style={styles.legalText}> and </Text>
-            <Pressable onPress={() => router.push('/privacy-policy')}>
+            <Pressable onPress={() => router.push('/privacy-policy?from=signup')}>
               <Text style={styles.legalLink}>Privacy Policy</Text>
             </Pressable>
           </View>

@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { View, Text, Switch, ScrollView, StyleSheet, Alert, Pressable, Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { colors, spacing, typography, borderRadius } from '../../constants/theme';
 import { parseError } from '../../lib/errorHandler';
+import AppHeader from "../../components/ui/AppHeader";
 
 export default function SettingsScreen() {
   const { user, signOut, deleteAccount } = useAuth();
@@ -103,7 +103,8 @@ export default function SettingsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+      <AppHeader />
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.content}
@@ -213,7 +214,7 @@ export default function SettingsScreen() {
           </Text>
         </Pressable>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

@@ -70,8 +70,6 @@ export default function LoginScreen() {
           <Text style={styles.logoSub}>Track prices, save money.</Text>
         </View>
 
-        <Text style={styles.title}>Welcome back</Text>
-
         <View style={styles.card}>
           {error ? (
             <View style={styles.errorRow}>

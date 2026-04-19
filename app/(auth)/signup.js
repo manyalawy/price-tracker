@@ -74,10 +74,6 @@ export default function SignUpScreen() {
     return (
       <View style={styles.container}>
         <View style={styles.successOuter}>
-          <View style={styles.logoSection}>
-            <Text style={styles.logo}>Dipp</Text>
-            <Text style={styles.logoSub}>Track prices, save money.</Text>
-          </View>
 
           <Text style={styles.title}>Create Account</Text>
 
@@ -108,11 +104,6 @@ export default function SignUpScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.logoSection}>
-          <Text style={styles.logo}>Dipp</Text>
-          <Text style={styles.logoSub}>Track prices, save money.</Text>
-        </View>
-
         <Text style={styles.title}>Create Account</Text>
 
         <View style={styles.card}>

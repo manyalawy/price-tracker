@@ -15,7 +15,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.dipp.app"
+      "bundleIdentifier": "com.manyalawy.dipp"
     },
     "android": {
       "adaptiveIcon": {

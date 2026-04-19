@@ -2,13 +2,16 @@ import { useState, useEffect } from 'react';
 import { View, Text, Switch, ScrollView, StyleSheet, Alert, Pressable, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { colors, spacing, typography, borderRadius } from '../../constants/theme';
 import { parseError } from '../../lib/errorHandler';
 
 export default function SettingsScreen() {
-  const { user, signOut } = useAuth();
+  const { user, signOut, deleteAccount } = useAuth();
+  const router = useRouter();
+  const [deleting, setDeleting] = useState(false);
   const [emailNotifs, setEmailNotifs] = useState(true);
   const [pushNotifs, setPushNotifs] = useState(true);
   useEffect(() => {
@@ -61,6 +64,42 @@ export default function SettingsScreen() {
       { text: 'Cancel', style: 'cancel' },
       { text: 'Sign Out', style: 'destructive', onPress: () => signOut() },
     ]);
+  };
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      'Delete Account',
+      'This will permanently delete your account and all your tracked products. This cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete Account',
+          style: 'destructive',
+          onPress: () => {
+            Alert.alert(
+              'Are you sure?',
+              'Your account and all data will be permanently deleted.',
+              [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                  text: 'Yes, Delete',
+                  style: 'destructive',
+                  onPress: async () => {
+                    setDeleting(true);
+                    try {
+                      await deleteAccount();
+                    } catch (e) {
+                      setDeleting(false);
+                      Alert.alert('Error', parseError(e));
+                    }
+                  },
+                },
+              ]
+            );
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -134,6 +173,26 @@ export default function SettingsScreen() {
                 <Text style={styles.versionLabel}>Version</Text>
                 <Text style={styles.versionValue}>Dipp v1.0.0</Text>
               </View>
+
+              <View style={styles.divider} />
+
+              <Pressable style={styles.legalRow} onPress={() => router.push('/privacy-policy')}>
+                <View style={styles.iconSquare}>
+                  <Ionicons name="shield-checkmark-outline" size={20} color={colors.textLabel} />
+                </View>
+                <Text style={styles.legalLabel}>Privacy Policy</Text>
+                <Ionicons name="chevron-forward" size={16} color={colors.textLabel} />
+              </Pressable>
+
+              <View style={styles.divider} />
+
+              <Pressable style={styles.legalRow} onPress={() => router.push('/terms')}>
+                <View style={styles.iconSquare}>
+                  <Ionicons name="document-text-outline" size={20} color={colors.textLabel} />
+                </View>
+                <Text style={styles.legalLabel}>Terms of Service</Text>
+                <Ionicons name="chevron-forward" size={16} color={colors.textLabel} />
+              </Pressable>
             </View>
           </View>
         </View>
@@ -141,6 +200,17 @@ export default function SettingsScreen() {
         <Pressable onPress={handleSignOut} style={styles.signOut}>
           <Ionicons name="log-out-outline" size={18} color={colors.dangerAlt} />
           <Text style={styles.signOutText}>Sign Out</Text>
+        </Pressable>
+
+        <Pressable
+          onPress={handleDeleteAccount}
+          disabled={deleting}
+          style={styles.deleteAccount}
+        >
+          <Ionicons name="trash-outline" size={16} color={colors.danger} />
+          <Text style={styles.deleteAccountText}>
+            {deleting ? 'Deleting…' : 'Delete Account'}
+          </Text>
         </Pressable>
       </ScrollView>
     </SafeAreaView>
@@ -280,5 +350,33 @@ const styles = StyleSheet.create({
     color: colors.dangerAlt,
     fontSize: typography.sizes.md,
     fontWeight: typography.weights.semibold,
+  },
+  deleteAccount: {
+    marginTop: spacing.sm,
+    paddingBottom: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+  },
+  deleteAccountText: {
+    color: colors.danger,
+    fontSize: typography.sizes.sm,
+    fontWeight: typography.weights.medium,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: colors.border + '40',
+    marginVertical: spacing.sm,
+  },
+  legalRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  legalLabel: {
+    color: colors.textWarm,
+    fontSize: typography.sizes.md,
+    flex: 1,
   },
 });

@@ -52,6 +52,12 @@ export function AuthProvider({ children }) {
     return result;
   };
 
+  const deleteAccount = async () => {
+    const { error } = await supabase.rpc('delete_user');
+    if (error) throw error;
+    await supabase.auth.signOut();
+  };
+
   const createSessionFromUrl = async (url) => {
     // PKCE flow: code in query params
     const parsed = Linking.parse(url);
@@ -99,7 +105,7 @@ export function AuthProvider({ children }) {
   const signInWithApple = () => signInWithOAuth('apple');
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut, resetPassword, updatePassword, signInWithGoogle, signInWithApple }}>
+    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut, resetPassword, updatePassword, deleteAccount, signInWithGoogle, signInWithApple }}>
       {children}
     </AuthContext.Provider>
   );

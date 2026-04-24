@@ -1,12 +1,16 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Redirect, Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import * as Linking from 'expo-linking';
+import * as SplashScreen from 'expo-splash-screen';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { ProductsProvider } from '../contexts/ProductsContext';
 import { registerForPushNotifications, setupNotificationResponseHandler } from '../lib/notifications';
 import { colors } from '../constants/theme';
+import AnimatedSplash from '../components/AnimatedSplash';
+
+SplashScreen.preventAutoHideAsync();
 
 function RootLayoutNav() {
   const { user, session, loading, isPasswordRecovery, handleDeepLink } = useAuth();
@@ -67,10 +71,17 @@ function RootLayoutNav() {
 }
 
 export default function RootLayout() {
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    SplashScreen.hideAsync();
+  }, []);
+
   return (
     <AuthProvider>
       <ProductsProvider>
         <RootLayoutNav />
+        {showSplash && <AnimatedSplash onComplete={() => setShowSplash(false)} />}
       </ProductsProvider>
     </AuthProvider>
   );

@@ -1,8 +1,7 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Image, StyleSheet } from 'react-native';
 import { BlurView } from 'expo-blur';
-import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, spacing, typography } from '../../constants/theme';
+import { colors, spacing } from '../../constants/theme';
 
 export default function AppHeader() {
   const insets = useSafeAreaInsets();
@@ -23,8 +22,7 @@ export default function AppHeader() {
         ]}
       >
         <View style={styles.headerLeft}>
-          <Ionicons name="pricetag" size={16} color={colors.accent} />
-          <Text style={styles.headerTitle}>Dipp</Text>
+          <Image source={require('../../assets/logo.png')} style={styles.logo} />
         </View>
       </BlurView>
     </View>
@@ -39,12 +37,9 @@ const styles = StyleSheet.create({
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
   },
-  headerTitle: {
-    fontSize: typography.sizes.xl,
-    color: colors.accent,
-    letterSpacing: -1,
-    fontWeight: typography.weights.regular,
+  logo: {
+    width: 48,
+    height: 48,
   },
 });

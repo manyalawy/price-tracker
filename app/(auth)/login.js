@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Alert } from 'react-native';
+import { View, Text, Image, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Alert } from 'react-native';
 import { Link } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
 import Input from '../../components/ui/Input';
@@ -66,7 +66,7 @@ export default function LoginScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.logoSection}>
-          <Text style={styles.logo}>Dipp</Text>
+          <Image source={require('../../assets/logo.png')} style={styles.logo} />
           <Text style={styles.logoSub}>Track prices, save money.</Text>
         </View>
 
@@ -129,10 +129,9 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xl,
   },
   logo: {
-    color: colors.accent,
-    fontSize: typography.sizes.xl,
-    fontWeight: typography.weights.bold,
-    letterSpacing: 0.5,
+    width: 72,
+    height: 72,
+    marginBottom: spacing.xs,
   },
   logoSub: {
     color: colors.textMuted,

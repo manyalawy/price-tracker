@@ -10,6 +10,7 @@ import { extractProduct } from '../../lib/api';
 import { useProducts } from '../../contexts/ProductsContext';
 import { parseError } from '../../lib/errorHandler';
 import { colors, spacing, typography, borderRadius } from '../../constants/theme';
+import { MAX_PRODUCTS } from '../../constants/config';
 import AppHeader from '../../components/ui/AppHeader';
 
 export default function AddScreen() {
@@ -52,8 +53,8 @@ export default function AddScreen() {
   };
 
   const handleTrack = async () => {
-    if (products.length >= 10) {
-      setError("You've reached the 10-product limit. Remove a product to add a new one.");
+    if (products.length >= MAX_PRODUCTS) {
+      setError(`You've reached the ${MAX_PRODUCTS}-product limit. Remove a product to add a new one.`);
       return;
     }
     const target = parseFloat(targetPrice);

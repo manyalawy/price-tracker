@@ -1,6 +1,7 @@
 import { createContext, useContext, useReducer, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './AuthContext';
+import { MAX_PRODUCTS } from '../constants/config';
 
 const ProductsContext = createContext({});
 
@@ -56,8 +57,8 @@ export function ProductsProvider({ children }) {
 
   const addProduct = async (productData) => {
     if (!user) throw new Error('You must be signed in to track a product');
-    if (state.products.length >= 10) {
-      throw new Error("You've reached the 10-product limit. Remove a product to add a new one.");
+    if (state.products.length >= MAX_PRODUCTS) {
+      throw new Error(`You've reached the ${MAX_PRODUCTS}-product limit. Remove a product to add a new one.`);
     }
     const { data, error } = await supabase
       .from('products')

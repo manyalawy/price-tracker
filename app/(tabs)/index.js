@@ -38,7 +38,7 @@ export default function HomeScreen() {
   const userName = user?.email ? user.email.split('@')[0] : '';
 
   const priceDrop = products.filter(
-    p => p.current_price != null && p.target_price != null && p.current_price <= p.target_price
+    p => p.current_price != null && p.original_price != null && p.current_price < p.original_price
   ).length;
 
   const ListHeader = (
@@ -57,7 +57,7 @@ export default function HomeScreen() {
             </View>
             <View style={styles.targetPill}>
               <View style={styles.targetDot} />
-              <Text style={styles.targetPillText}>{priceDrop} AT TARGET</Text>
+              <Text style={styles.targetPillText}>{priceDrop} PRICE DROP</Text>
             </View>
           </View>
         )}

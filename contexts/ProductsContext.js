@@ -69,7 +69,8 @@ export function ProductsProvider({ children }) {
         image_url: productData.image_url,
         domain: productData.domain,
         current_price: productData.price,
-        target_price: productData.target_price,
+        original_price: productData.price,
+        target_price: null,
         currency: productData.currency || 'USD',
         highest_price: productData.price,
         lowest_price: productData.price,
@@ -104,20 +105,8 @@ export function ProductsProvider({ children }) {
     dispatch({ type: 'REMOVE_PRODUCT', payload: productId });
   };
 
-  const updateTargetPrice = async (productId, newTarget) => {
-    if (!user) throw new Error('You must be signed in to update a product');
-    const { error } = await supabase
-      .from('products')
-      .update({ target_price: newTarget, updated_at: new Date().toISOString() })
-      .eq('id', productId)
-      .eq('user_id', user.id);
-
-    if (error) throw error;
-    dispatch({ type: 'UPDATE_PRODUCT', payload: { id: productId, target_price: newTarget } });
-  };
-
   return (
-    <ProductsContext.Provider value={{ ...state, fetchProducts, addProduct, deleteProduct, updateTargetPrice }}>
+    <ProductsContext.Provider value={{ ...state, fetchProducts, addProduct, deleteProduct }}>
       {children}
     </ProductsContext.Provider>
   );

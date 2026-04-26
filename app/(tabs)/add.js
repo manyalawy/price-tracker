@@ -17,7 +17,6 @@ export default function AddScreen() {
   const router = useRouter();
   const { addProduct, products } = useProducts();
   const [url, setUrl] = useState('');
-  const [targetPrice, setTargetPrice] = useState('');
   const [extracting, setExtracting] = useState(false);
   const [saving, setSaving] = useState(false);
   const [product, setProduct] = useState(null);
@@ -57,15 +56,6 @@ export default function AddScreen() {
       setError(`You've reached the ${MAX_PRODUCTS}-product limit. Remove a product to add a new one.`);
       return;
     }
-    const target = parseFloat(targetPrice);
-    if (!target || target <= 0) {
-      setError('Please enter a valid target price');
-      return;
-    }
-    if (target >= product.price) {
-      setError('Target price must be lower than the current price');
-      return;
-    }
     setSaving(true);
     setError('');
 
@@ -77,14 +67,12 @@ export default function AddScreen() {
         domain: product.domain,
         price: product.price,
         currency: product.currency,
-        target_price: target,
         method: product.method,
         selector: product.selector,
       });
       Alert.alert('Success', 'Product is now being tracked!', [
         { text: 'OK', onPress: () => {
           setUrl('');
-          setTargetPrice('');
           setProduct(null);
           router.push('/(tabs)');
         }},
@@ -97,7 +85,7 @@ export default function AddScreen() {
   };
 
   const fetchDisabled = !url.trim() || extracting;
-  const trackDisabled = !targetPrice || saving;
+  const trackDisabled = saving;
 
   return (
     <View style={styles.container}>
@@ -161,23 +149,6 @@ export default function AddScreen() {
           {product && (
             <View style={styles.fetchedSection}>
               <ProductPreview product={product} />
-
-              <View style={styles.targetPriceWrapper}>
-                <Text style={styles.targetLabel}>SET YOUR TARGET PRICE</Text>
-                <View style={styles.targetInputContainer}>
-                  <TextInput
-                    style={styles.targetInput}
-                    value={targetPrice}
-                    onChangeText={setTargetPrice}
-                    placeholder="0.00"
-                    placeholderTextColor={colors.textMuted}
-                    keyboardType="decimal-pad"
-                  />
-                  <View style={styles.targetUsdContainer}>
-                    <Text style={styles.targetUsd}>{product.currency}</Text>
-                  </View>
-                </View>
-              </View>
 
               <TouchableOpacity onPress={handleTrack} disabled={trackDisabled} activeOpacity={0.85}>
                 <LinearGradient
@@ -307,47 +278,6 @@ const styles = StyleSheet.create({
     borderTopColor: 'rgba(72,71,74,0.1)',
     paddingTop: 17,
     gap: spacing.xl,
-  },
-  targetPriceWrapper: {
-    gap: spacing.sm,
-  },
-  targetLabel: {
-    color: colors.textLabel,
-    fontSize: 11,
-    letterSpacing: 1.1,
-    textTransform: 'uppercase',
-    paddingHorizontal: spacing.xs,
-  },
-  targetInputContainer: {
-    height: 80,
-    backgroundColor: colors.groupBg,
-    borderRadius: borderRadius.xl,
-    borderWidth: 1,
-    borderColor: 'rgba(72,71,74,0.2)',
-    overflow: 'hidden',
-    justifyContent: 'center',
-  },
-  targetInput: {
-    flex: 1,
-    color: colors.textMuted,
-    fontSize: typography.sizes.display,
-    letterSpacing: -0.9,
-    paddingLeft: spacing.lg,
-    paddingRight: 64,
-    height: '100%',
-  },
-  targetUsdContainer: {
-    position: 'absolute',
-    right: 24,
-    top: 0,
-    bottom: 0,
-    justifyContent: 'center',
-  },
-  targetUsd: {
-    color: 'rgba(63,255,139,0.4)',
-    fontSize: typography.sizes.sm,
-    letterSpacing: 1.4,
-    textTransform: 'uppercase',
   },
   trackButton: {
     height: 64,

@@ -1,24 +1,15 @@
-import { useState } from 'react';
 import { View, Text, ScrollView, Alert, StyleSheet } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useProducts } from '../../contexts/ProductsContext';
 import StatCard from '../../components/StatCard';
-import EditTargetModal from '../../components/EditTargetModal';
 import Button from '../../components/ui/Button';
 import { colors, spacing, typography } from '../../constants/theme';
 
 export default function ProductDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
-  const { products, deleteProduct, updateTargetPrice } = useProducts();
+  const { products, deleteProduct } = useProducts();
   const product = products.find(p => p.id === id);
-
-  const [editModalVisible, setEditModalVisible] = useState(false);
-
-  const handleEditTarget = async (newTarget) => {
-    await updateTargetPrice(id, newTarget);
-    setEditModalVisible(false);
-  };
 
   const handleStopTracking = () => {
     Alert.alert('Stop Tracking', 'Are you sure you want to stop tracking this product?', [
@@ -50,7 +41,7 @@ export default function ProductDetailScreen() {
         <View style={styles.priceRow}>
           <Text style={styles.price}>{product.current_price?.toFixed(2)} {product.currency}</Text>
           <Text style={styles.statusBadge}>
-            {product.current_price != null && product.target_price != null && product.current_price <= product.target_price ? 'TARGET HIT' : 'ON'}
+            {product.original_price != null && product.current_price < product.original_price ? 'PRICE DROP' : 'ON'}
           </Text>
         </View>
 
@@ -58,30 +49,15 @@ export default function ProductDetailScreen() {
         <View style={styles.statsRow}>
           <StatCard label="Highest" value={`${product.highest_price?.toFixed(2) || '—'} ${product.currency}`} />
           <StatCard label="Lowest" value={`${product.lowest_price?.toFixed(2) || '—'} ${product.currency}`} color={colors.accent} />
-          <StatCard label="Target" value={`${product.target_price?.toFixed(2)} ${product.currency}`} color={colors.accent} />
+          <StatCard label="Original" value={`${product.original_price?.toFixed(2) || '—'} ${product.currency}`} />
         </View>
 
         {/* Actions */}
-        <Button
-          title="Edit Target Price"
-          variant="ghost"
-          onPress={() => setEditModalVisible(true)}
-          style={styles.actionBtn}
-        />
         <Button
           title="Stop Tracking"
           variant="danger"
           onPress={handleStopTracking}
           style={styles.actionBtn}
-        />
-
-        <EditTargetModal
-          visible={editModalVisible}
-          currentTarget={product.target_price}
-          currentPrice={product.current_price}
-          currency={product.currency}
-          onSave={handleEditTarget}
-          onClose={() => setEditModalVisible(false)}
         />
       </View>
     </ScrollView>

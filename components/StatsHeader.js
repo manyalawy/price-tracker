@@ -3,7 +3,7 @@ import { colors, spacing, typography, borderRadius } from '../constants/theme';
 
 export default function StatsHeader({ products }) {
   const trackingCount = products.length;
-  const dropsCount = products.filter(p => p.current_price <= p.target_price).length;
+  const dropsCount = products.filter(p => p.original_price != null && p.current_price < p.original_price).length;
 
   return (
     <View style={styles.container}>

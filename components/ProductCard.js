@@ -8,11 +8,7 @@ export default function ProductCard({ product }) {
   const router = useRouter();
   const { deleteProduct } = useProducts();
 
-  const priceDiff = product.target_price - product.current_price;
-  const pctFromTarget = product.target_price > 0
-    ? ((priceDiff / product.target_price) * 100).toFixed(0)
-    : 0;
-  const isAtTarget = product.current_price <= product.target_price;
+  const isPriceDrop = product.original_price != null && product.current_price < product.original_price;
 
   const handlePress = () => {
     router.push(`/product/${product.id}`);
@@ -44,9 +40,9 @@ export default function ProductCard({ product }) {
           <Text style={styles.domain}>{product.domain}</Text>
           <Text style={styles.name} numberOfLines={2}>{product.name}</Text>
         </View>
-        {isAtTarget && (
+        {isPriceDrop && (
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>{'TARGET\nHIT'}</Text>
+            <Text style={styles.badgeText}>{'PRICE\nDROP'}</Text>
           </View>
         )}
       </View>
@@ -54,20 +50,11 @@ export default function ProductCard({ product }) {
       <View style={styles.bottomSection}>
         <View>
           <View style={styles.priceRow}>
-            <Text style={[styles.price, isAtTarget && styles.priceAtTarget]}>
+            <Text style={[styles.price, isPriceDrop && styles.priceAtTarget]}>
               {product.current_price?.toFixed(2)}
             </Text>
             <Text style={styles.currencyLabel}>{product.currency}</Text>
           </View>
-          {isAtTarget ? (
-            <Text style={styles.targetHitLabel}>
-              Target: {product.target_price?.toFixed(2)} {product.currency}
-            </Text>
-          ) : (
-            <Text style={styles.diffLabel}>
-              {Math.abs(priceDiff).toFixed(2)} {product.currency} above target · {Math.abs(pctFromTarget)}%
-            </Text>
-          )}
         </View>
         <Ionicons name="stats-chart-outline" size={22} color={colors.textLabel} />
       </View>
@@ -147,14 +134,5 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     marginLeft: spacing.xs,
     marginBottom: 4,
-  },
-  targetHitLabel: {
-    fontSize: typography.sizes.xs,
-    color: colors.textLabel,
-  },
-  diffLabel: {
-    fontSize: typography.sizes.xs,
-    color: colors.dangerAlt,
-    marginTop: 4,
   },
 });

@@ -162,6 +162,11 @@ export default function AddScreen() {
                   </Text>
                 </LinearGradient>
               </TouchableOpacity>
+
+              <View style={styles.checkNote}>
+                <Ionicons name="time-outline" size={13} color={colors.textMuted} />
+                <Text style={styles.checkNoteText}>Prices are checked every 24 hours</Text>
+              </View>
             </View>
           )}
 
@@ -294,5 +299,15 @@ const styles = StyleSheet.create({
     color: colors.accentText,
     fontSize: typography.sizes.xl,
     fontWeight: typography.weights.medium,
+  },
+  checkNote: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
+  },
+  checkNoteText: {
+    color: colors.textMuted,
+    fontSize: typography.sizes.xs,
   },
 });

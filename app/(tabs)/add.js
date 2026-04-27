@@ -150,22 +150,24 @@ export default function AddScreen() {
             <View style={styles.fetchedSection}>
               <ProductPreview product={product} />
 
-              <TouchableOpacity onPress={handleTrack} disabled={trackDisabled} activeOpacity={0.85}>
-                <LinearGradient
-                  colors={['#3fff8b', '#13ea79']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={[styles.trackButton, trackDisabled && styles.buttonDisabled]}
-                >
-                  <Text style={styles.trackButtonText}>
-                    {saving ? 'Saving...' : 'Start Tracking'}
-                  </Text>
-                </LinearGradient>
-              </TouchableOpacity>
+              <View style={styles.trackSection}>
+                <TouchableOpacity onPress={handleTrack} disabled={trackDisabled} activeOpacity={0.85}>
+                  <LinearGradient
+                    colors={['#3fff8b', '#13ea79']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={[styles.trackButton, trackDisabled && styles.buttonDisabled]}
+                  >
+                    <Text style={styles.trackButtonText}>
+                      {saving ? 'Saving...' : 'Start Tracking'}
+                    </Text>
+                  </LinearGradient>
+                </TouchableOpacity>
 
-              <View style={styles.checkNote}>
-                <Ionicons name="time-outline" size={13} color={colors.textMuted} />
-                <Text style={styles.checkNoteText}>Prices are checked every 24 hours</Text>
+                <View style={styles.checkNote}>
+                  <Ionicons name="time-outline" size={13} color={colors.textMuted} />
+                  <Text style={styles.checkNoteText}>Prices are checked every 24 hours</Text>
+                </View>
               </View>
             </View>
           )}
@@ -283,6 +285,9 @@ const styles = StyleSheet.create({
     borderTopColor: 'rgba(72,71,74,0.1)',
     paddingTop: 17,
     gap: spacing.xl,
+  },
+  trackSection: {
+    gap: spacing.sm,
   },
   trackButton: {
     height: 64,

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Dipp — Track any product price and get notified the moment it drops. Free for iPhone." />
+  <title>Dipp — Price Tracker</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0e0e10;
+      --card: #141414;
+      --accent: #3fff8b;
+      --accent-dark: #2ecc71;
+      --text: #ffffff;
+      --text-secondary: #9ca3af;
+      --border: #374151;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* NAV */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(14, 14, 16, 0.9);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+    .nav-logo {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: -0.02em;
+    }
+    .nav-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+    .nav-link:hover { color: var(--text); }
+
+    /* HERO */
+    .hero {
+      text-align: center;
+      padding: 100px 24px 80px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(63, 255, 139, 0.12);
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      border: 1px solid rgba(63, 255, 139, 0.25);
+      margin-bottom: 28px;
+    }
+    .hero h1 {
+      font-size: clamp(2.4rem, 6vw, 3.6rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero p {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      max-width: 520px;
+      margin: 0 auto 40px;
+    }
+    .cta-group { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: #004f24;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 14px 28px;
+      border-radius: 9999px;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .btn-primary:hover { opacity: 0.85; }
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 14px 28px;
+      border-radius: 9999px;
+      border: 1px solid var(--border);
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--text-secondary); color: var(--text); }
+
+    /* HOW IT WORKS */
+    .section {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 80px 24px;
+    }
+    .section-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 48px;
+    }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+    }
+    .step {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+    }
+    .step-number {
+      width: 36px;
+      height: 36px;
+      border-radius: 9999px;
+      background: rgba(63, 255, 139, 0.12);
+      border: 1px solid rgba(63, 255, 139, 0.3);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    .step h3 { font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
+    .step p { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; }
+
+    /* FEATURES */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .feature {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .feature-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .feature h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 6px; }
+    .feature p { color: var(--text-secondary); font-size: 0.875rem; line-height: 1.5; }
+
+    /* DIVIDER */
+    .divider { border: none; border-top: 1px solid var(--border); }
+
+    /* CTA BANNER */
+    .cta-banner {
+      text-align: center;
+      padding: 80px 24px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .cta-banner h2 {
+      font-size: clamp(1.8rem, 4vw, 2.4rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .cta-banner p {
+      color: var(--text-secondary);
+      margin-bottom: 36px;
+      font-size: 1rem;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer-logo { font-size: 1rem; font-weight: 700; color: var(--accent); }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--text); }
+    .footer-copy { color: var(--text-secondary); font-size: 0.8rem; }
+
+    @media (max-width: 600px) {
+      nav { padding: 16px 20px; }
+      footer { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <span class="nav-logo">Dipp</span>
+    <a class="nav-link" href="support.html">Support</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">Free for iPhone</div>
+    <h1>Track any price.<br /><span>Get alerted instantly.</span></h1>
+    <p>Paste a product URL, and Dipp monitors the price for you. The moment it drops, you get a notification — no manual checking required.</p>
+    <div class="cta-group">
+      <a class="btn-primary" href="https://apps.apple.com/app/dipp/id6766212673">
+        Download on the App Store
+      </a>
+      <a class="btn-secondary" href="support.html">Learn more</a>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- HOW IT WORKS -->
+  <section class="section">
+    <p class="section-label">How it works</p>
+    <h2 class="section-title">Three steps to never overpay again</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <h3>Paste a URL</h3>
+        <p>Copy any product URL from a supported online store and paste it into Dipp.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <h3>We fetch the details</h3>
+        <p>Dipp instantly pulls the product name, image, and current price — no manual entry.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <h3>Get notified</h3>
+        <p>When the price drops, you get a push notification immediately. Buy at the right moment.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- FEATURES -->
+  <section class="section">
+    <p class="section-label">Features</p>
+    <h2 class="section-title">Everything you need, nothing you don't</h2>
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">🔔</div>
+        <div>
+          <h3>Instant push notifications</h3>
+          <p>Get alerted the moment a price drops — no polling, no delays.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">📈</div>
+        <div>
+          <h3>Full price history</h3>
+          <p>See how a product's price has changed over time with a clear chart.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🌙</div>
+        <div>
+          <h3>Dark mode</h3>
+          <p>A clean, distraction-free interface built for comfortable use at any time of day.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🔒</div>
+        <div>
+          <h3>Private by design</h3>
+          <p>Your data is yours. No ads, no selling of data, no third-party tracking.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">⚡</div>
+        <div>
+          <h3>Instant URL parsing</h3>
+          <p>Paste a URL and Dipp fetches the name, image, and price in seconds.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🆓</div>
+        <div>
+          <h3>Completely free</h3>
+          <p>No subscriptions, no hidden fees. Download and start tracking immediately.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- CTA BANNER -->
+  <div class="cta-banner">
+    <h2>Start tracking prices today.</h2>
+    <p>Free for iPhone. No sign-up friction, no credit card.</p>
+    <a class="btn-primary" href="https://apps.apple.com/app/dipp/id6766212673">
+      Download on the App Store
+    </a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <span class="footer-logo">Dipp</span>
+    <div class="footer-links">
+      <a href="privacy-policy.html">Privacy Policy</a>
+      <a href="support.html">Support</a>
+    </div>
+    <span class="footer-copy">© 2026 Youssef Manyalawy</span>
+  </footer>
+
+</body>
+</html>

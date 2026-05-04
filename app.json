@@ -15,7 +15,11 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.manyalawy.dipp"
+      "bundleIdentifier": "com.manyalawy.dipp",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSUserNotificationUsageDescription": "Dipp sends you alerts when your tracked product prices drop."
+      }
     },
     "android": {
       "adaptiveIcon": {

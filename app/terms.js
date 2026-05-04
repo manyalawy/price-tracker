@@ -51,7 +51,7 @@ We may update these Terms from time to time. Continued use of the app after chan
 
 CONTACT
 
-For questions about these Terms, contact us at: [your-email@example.com]`}
+For questions about these Terms, contact us at: manyalawy@gmail.com`}
         </Text>
       </ScrollView>
     </SafeAreaView>

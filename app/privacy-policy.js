@@ -46,7 +46,7 @@ Your data is stored until you delete your account. You can delete your account a
 
 CONTACT US
 
-If you have any questions about this Privacy Policy, please contact us at: [your-email@example.com]`}
+If you have any questions about this Privacy Policy, please contact us at: manyalawy@gmail.com`}
         </Text>
       </ScrollView>
     </SafeAreaView>

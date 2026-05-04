@@ -137,10 +137,9 @@ export function AuthProvider({ children }) {
   };
 
   const signInWithGoogle = () => signInWithOAuth('google');
-  const signInWithApple = () => signInWithOAuth('apple');
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, isPasswordRecovery, clearPasswordRecovery, handleDeepLink, signUp, signIn, signOut, resetPassword, updatePassword, deleteAccount, signInWithGoogle, signInWithApple }}>
+    <AuthContext.Provider value={{ user, session, loading, isPasswordRecovery, clearPasswordRecovery, handleDeepLink, signUp, signIn, signOut, resetPassword, updatePassword, deleteAccount, signInWithGoogle }}>
       {children}
     </AuthContext.Provider>
   );

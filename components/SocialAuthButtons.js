@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, ActivityIndicator, StyleSheet } from 'rea
 import { AntDesign } from '@expo/vector-icons';
 import { colors, spacing, typography, borderRadius } from '../constants/theme';
 
-export default function SocialAuthButtons({ onGoogle, onApple, loadingProvider = null }) {
+export default function SocialAuthButtons({ onGoogle, loadingProvider = null }) {
   return (
     <View>
       <View style={styles.dividerRow}>
@@ -23,22 +23,6 @@ export default function SocialAuthButtons({ onGoogle, onApple, loadingProvider =
           <>
             <AntDesign name="google" size={18} color={colors.text} style={styles.icon} />
             <Text style={styles.buttonText}>Continue with Google</Text>
-          </>
-        )}
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.button}
-        onPress={onApple}
-        disabled={loadingProvider !== null}
-        activeOpacity={0.7}
-      >
-        {loadingProvider === 'apple' ? (
-          <ActivityIndicator size="small" color={colors.text} />
-        ) : (
-          <>
-            <AntDesign name="apple" size={18} color={colors.text} style={styles.icon} />
-            <Text style={styles.buttonText}>Continue with Apple</Text>
           </>
         )}
       </TouchableOpacity>

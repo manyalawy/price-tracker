@@ -13,10 +13,12 @@
     "production": {}
   },
   "submit": {
-    "ios": {
-      "appleId": "manyalawy@gmail.com",
-      "ascAppId": "6766212673",
-      "appleTeamId": "5W935LLV6Uyes"
+    "production": {
+      "ios": {
+        "appleId": "manyalawy@gmail.com",
+        "ascAppId": "6766212673",
+        "appleTeamId": "5W935LLV6U"
+      }
     }
   }
 }

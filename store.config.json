@@ -1,0 +1,26 @@
+{
+  "configVersion": 0,
+  "apple": {
+    "info": {
+      "en-US": {
+        "title": "Dipp - Price Tracker",
+        "subtitle": "Track prices. Get alerts.",
+        "description": "Dipp is the simplest way to never overpay for something you want.\n\nPaste any product URL from your favourite online stores, and Dipp tracks the price for you — automatically, in the background. When the price drops, you get an instant notification.\n\nHOW IT WORKS\n\n1. Copy a product URL from any supported store\n2. Paste it into Dipp — we fetch the product name, image, and current price instantly\n3. Dipp checks the price regularly and notifies you the moment it drops\n\nWHAT YOU GET\n\n• Real-time price monitoring — Dipp checks prices automatically so you don't have to\n• Instant push notifications — get alerted the moment a price drops below what you first saw\n• Full price history — see how a product's price has changed over time with a clear chart\n• Clean, distraction-free interface — no ads, no noise, just your tracked products\n• Dark mode — easy on the eyes, any time of day\n\nPERFECT FOR\n\n• Waiting for a sale before buying something expensive\n• Tracking prices on gifts you want to buy\n• Making sure you're getting the best deal before checkout\n\nDipp is free to use. No subscriptions, no hidden fees.",
+        "keywords": [
+          "price tracker",
+          "price drop",
+          "deal alert",
+          "shopping",
+          "price history",
+          "price watch",
+          "amazon"
+        ],
+        "releaseNotes": "Initial release of Dipp — track product prices and get notified when they drop.",
+        "promoText": "Never overpay again. Track any price, get alerted instantly.",
+        "marketingUrl": "https://manyalawy.github.io/dipp",
+        "supportUrl": "https://manyalawy.github.io/dipp/support.html",
+        "privacyPolicyUrl": "https://manyalawy.github.io/dipp/privacy-policy.html"
+      }
+    }
+  }
+}

@@ -19,20 +19,25 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const init = async () => {
-      // Check for a recovery deep link before setting loading=false so the auth
-      // guard doesn't redirect to login while the token exchange is in flight.
-      const [initialUrl, { data: { session: initialSession } }] = await Promise.all([
-        Linking.getInitialURL(),
-        supabase.auth.getSession(),
-      ]);
+      try {
+        // Check for a recovery deep link before setting loading=false so the auth
+        // guard doesn't redirect to login while the token exchange is in flight.
+        const [initialUrl, { data: { session: initialSession } }] = await Promise.all([
+          Linking.getInitialURL(),
+          supabase.auth.getSession(),
+        ]);
 
-      if (isRecoveryUrl(initialUrl)) {
-        setIsPasswordRecovery(true);
+        if (isRecoveryUrl(initialUrl)) {
+          setIsPasswordRecovery(true);
+        }
+
+        setSession(initialSession);
+        setUser(initialSession?.user ?? null);
+      } catch (err) {
+        console.error('[AuthContext] init failed:', err)
+      } finally {
+        setLoading(false);
       }
-
-      setSession(initialSession);
-      setUser(initialSession?.user ?? null);
-      setLoading(false);
     };
 
     init();

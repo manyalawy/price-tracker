@@ -6,7 +6,6 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
-    "newArchEnabled": true,
     "scheme": "dipp",
     "splash": {
       "image": "./assets/splash-icon.png",
@@ -16,9 +15,9 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.manyalawy.dipp",
-      "buildNumber": "1",
       "infoPlist": {
-        "NSUserNotificationUsageDescription": "Dipp sends you alerts when your tracked product prices drop."
+        "NSUserNotificationUsageDescription": "Dipp sends you alerts when your tracked product prices drop.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -26,7 +25,6 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0a0a0a"
       },
-      "edgeToEdgeEnabled": true,
       "package": "com.dipp.app"
     },
     "web": {
@@ -34,7 +32,8 @@
     },
     "plugins": [
       "expo-router",
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-secure-store"
     ],
     "extra": {
       "router": {},

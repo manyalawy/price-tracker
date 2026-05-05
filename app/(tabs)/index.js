@@ -37,7 +37,9 @@ export default function HomeScreen() {
   const greetingBase = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
   const userName = user?.email ? user.email.split('@')[0] : '';
 
-  const priceDrop = products.filter(
+  const activeProducts = products.filter(p => p.is_active !== false);
+
+  const priceDrop = activeProducts.filter(
     p => p.current_price != null && p.original_price != null && p.current_price < p.original_price
   ).length;
 
@@ -47,13 +49,13 @@ export default function HomeScreen() {
       <View style={styles.heroSection}>
         <View style={styles.greetingGroup}>
           <Text style={styles.greetingLine}>{greetingBase}</Text>
-          <Text style={styles.subtitle}>You're tracking {products.length} products.</Text>
+          <Text style={styles.subtitle}>You're tracking {activeProducts.length} products.</Text>
         </View>
 
         {products.length > 0 && (
           <View style={styles.pillRow}>
             <View style={styles.trackingPill}>
-              <Text style={styles.trackingPillText}>{products.length} TRACKING</Text>
+              <Text style={styles.trackingPillText}>{activeProducts.length} TRACKING</Text>
             </View>
             <View style={styles.targetPill}>
               <View style={styles.targetDot} />

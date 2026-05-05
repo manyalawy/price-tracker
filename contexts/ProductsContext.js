@@ -45,7 +45,6 @@ export function ProductsProvider({ children }) {
         .from('products')
         .select('*')
         .eq('user_id', user.id)
-        .eq('is_active', true)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -94,16 +93,23 @@ export function ProductsProvider({ children }) {
   };
 
   const deleteProduct = async (productId) => {
-    if (!user) throw new Error('You must be signed in to delete a product');
+    if (!user) throw new Error('You must be signed in to delete a product')
+
+    const { error: historyError } = await supabase
+      .from('price_history')
+      .delete()
+      .eq('product_id', productId)
+    if (historyError) throw historyError
+
     const { error } = await supabase
       .from('products')
-      .update({ is_active: false, updated_at: new Date().toISOString() })
+      .delete()
       .eq('id', productId)
-      .eq('user_id', user.id);
+      .eq('user_id', user.id)
+    if (error) throw error
 
-    if (error) throw error;
-    dispatch({ type: 'REMOVE_PRODUCT', payload: productId });
-  };
+    dispatch({ type: 'REMOVE_PRODUCT', payload: productId })
+  }
 
   return (
     <ProductsContext.Provider value={{ ...state, fetchProducts, addProduct, deleteProduct }}>

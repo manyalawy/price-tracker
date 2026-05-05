@@ -9,6 +9,7 @@ export default function ProductCard({ product }) {
   const { deleteProduct } = useProducts();
 
   const isPriceDrop = product.original_price != null && product.current_price < product.original_price;
+  const isStopped = product.is_active === false;
 
   const handlePress = () => {
     router.push(`/product/${product.id}`);
@@ -38,25 +39,31 @@ export default function ProductCard({ product }) {
       <View style={styles.topSection}>
         <View style={styles.topLeft}>
           <Text style={styles.domain}>{product.domain}</Text>
-          <Text style={styles.name} numberOfLines={2}>{product.name}</Text>
+          <Text style={[styles.name, isStopped && styles.mutedText]} numberOfLines={2}>{product.name}</Text>
         </View>
-        {isPriceDrop && (
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>{'PRICE\nDROP'}</Text>
-          </View>
-        )}
+        <View style={styles.badgeRow}>
+          {isStopped && (
+            <View style={styles.stoppedBadge}>
+              <Text style={styles.stoppedBadgeText}>STOPPED TRACKING</Text>
+            </View>
+          )}
+          {isPriceDrop && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>PRICE DROPPED</Text>
+            </View>
+          )}
+        </View>
       </View>
 
       <View style={styles.bottomSection}>
         <View>
           <View style={styles.priceRow}>
-            <Text style={[styles.price, isPriceDrop && styles.priceAtTarget]}>
+            <Text style={[styles.price, isPriceDrop && styles.priceAtTarget, isStopped && styles.mutedText]}>
               {product.current_price?.toFixed(2)}
             </Text>
-            <Text style={styles.currencyLabel}>{product.currency}</Text>
+            <Text style={[styles.currencyLabel, isStopped && styles.mutedText]}>{product.currency}</Text>
           </View>
         </View>
-        <Ionicons name="stats-chart-outline" size={22} color={colors.textLabel} />
       </View>
     </Pressable>
   );
@@ -126,6 +133,27 @@ const styles = StyleSheet.create({
   },
   priceAtTarget: {
     color: colors.accent,
+  },
+  mutedText: {
+    color: colors.textMuted,
+  },
+  badgeRow: {
+    gap: spacing.xs,
+    alignItems: 'flex-end',
+  },
+  stoppedBadge: {
+    backgroundColor: colors.textMuted + '20',
+    borderRadius: borderRadius.full,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+  },
+  stoppedBadgeText: {
+    color: colors.textMuted,
+    fontSize: 10,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    textAlign: 'center',
+    fontWeight: typography.weights.regular,
   },
   currencyLabel: {
     fontSize: 10,

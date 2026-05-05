@@ -11,11 +11,11 @@ export default function ProductDetailScreen() {
   const { products, deleteProduct } = useProducts();
   const product = products.find(p => p.id === id);
 
-  const handleStopTracking = () => {
-    Alert.alert('Stop Tracking', 'Are you sure you want to stop tracking this product?', [
+  const handleDelete = () => {
+    Alert.alert('Delete Product', 'This will permanently delete this product and all its price history.', [
       { text: 'Cancel', style: 'cancel' },
       {
-        text: 'Stop Tracking',
+        text: 'Delete',
         style: 'destructive',
         onPress: async () => {
           await deleteProduct(id);
@@ -24,6 +24,9 @@ export default function ProductDetailScreen() {
       },
     ]);
   };
+
+  const isPriceDrop = product && product.original_price != null && product.current_price < product.original_price;
+  const isStopped = product && product.is_active === false;
 
   if (!product) {
     return (
@@ -41,9 +44,12 @@ export default function ProductDetailScreen() {
         <View style={styles.priceRow}>
           <Text style={styles.price}>{product.current_price?.toFixed(2)} {product.currency}</Text>
           <Text style={styles.statusBadge}>
-            {product.original_price != null && product.current_price < product.original_price ? 'PRICE DROP' : 'ON'}
+            {isPriceDrop ? 'PRICE DROPPED' : 'ON'}
           </Text>
         </View>
+        {isStopped && (
+          <Text style={styles.stoppedBadge}>STOPPED TRACKING</Text>
+        )}
 
         {/* Stats */}
         <View style={styles.statsRow}>
@@ -54,9 +60,9 @@ export default function ProductDetailScreen() {
 
         {/* Actions */}
         <Button
-          title="Stop Tracking"
+          title="Delete Product"
           variant="danger"
-          onPress={handleStopTracking}
+          onPress={handleDelete}
           style={styles.actionBtn}
         />
       </View>
@@ -105,6 +111,18 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     borderRadius: 6,
     overflow: 'hidden',
+  },
+  stoppedBadge: {
+    color: colors.textMuted,
+    fontSize: typography.sizes.xs,
+    fontWeight: '700',
+    backgroundColor: colors.textMuted + '20',
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 3,
+    borderRadius: 6,
+    overflow: 'hidden',
+    alignSelf: 'flex-start',
+    marginBottom: spacing.lg,
   },
   statsRow: {
     flexDirection: 'row',

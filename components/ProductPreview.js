@@ -1,7 +1,7 @@
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { colors, spacing, typography, borderRadius } from '../constants/theme';
 
-export default function ProductPreview({ product }) {
+export default function ProductPreview({ product, nameOverride }) {
   if (!product) return null;
 
   return (
@@ -13,7 +13,7 @@ export default function ProductPreview({ product }) {
         <View style={styles.metaRow}>
           <Text style={styles.domain}>{product.domain?.toUpperCase()}</Text>
         </View>
-        <Text style={styles.name} numberOfLines={2}>{product.name}</Text>
+        <Text style={styles.name} numberOfLines={2}>{nameOverride ?? product.name}</Text>
         <View style={styles.priceRow}>
           <Text style={styles.price}>{product.price?.toFixed(2)} {product.currency}</Text>
           <Text style={styles.currentLabel}>CURRENT</Text>

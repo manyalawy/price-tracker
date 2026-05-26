@@ -12,11 +12,13 @@ import { parseError } from '../../lib/errorHandler';
 import { colors, spacing, typography, borderRadius } from '../../constants/theme';
 import { MAX_PRODUCTS } from '../../constants/config';
 import AppHeader from '../../components/ui/AppHeader';
+import Input from '../../components/ui/Input';
 
 export default function AddScreen() {
   const router = useRouter();
   const { addProduct, products } = useProducts();
   const [url, setUrl] = useState('');
+  const [productName, setProductName] = useState('');
   const [extracting, setExtracting] = useState(false);
   const [saving, setSaving] = useState(false);
   const [product, setProduct] = useState(null);
@@ -42,6 +44,7 @@ export default function AddScreen() {
         setExtractFailed(true);
       } else {
         setProduct(result);
+        setProductName(result.name);
       }
     } catch (e) {
       setError("We couldn't fetch that item. Please check the URL and try again.");
@@ -62,7 +65,7 @@ export default function AddScreen() {
     try {
       await addProduct({
         url: url.trim(),
-        name: product.name,
+        name: productName.trim() || product.name,
         image_url: product.image_url,
         domain: product.domain,
         price: product.price,
@@ -74,6 +77,7 @@ export default function AddScreen() {
         { text: 'OK', onPress: () => {
           setUrl('');
           setProduct(null);
+          setProductName('');
           router.push('/(tabs)');
         }},
       ]);
@@ -148,7 +152,13 @@ export default function AddScreen() {
 
           {product && (
             <View style={styles.fetchedSection}>
-              <ProductPreview product={product} />
+              <ProductPreview product={product} nameOverride={productName} />
+              <Input
+                label="Product Name"
+                value={productName}
+                onChangeText={setProductName}
+                placeholder="Enter product name"
+              />
 
               <View style={styles.trackSection}>
                 <TouchableOpacity onPress={handleTrack} disabled={trackDisabled} activeOpacity={0.85}>

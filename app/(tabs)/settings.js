@@ -125,7 +125,6 @@ export default function SettingsScreen() {
                   <Text style={styles.accountEmailLabel}>EMAIL ADDRESS</Text>
                   <Text style={styles.accountEmail}>{user?.email}</Text>
                 </View>
-                <Ionicons name="chevron-forward" size={18} color={colors.textLabel} />
               </View>
             </View>
           </View>

@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 import { supabase } from '../lib/supabase';
 import * as WebBrowser from 'expo-web-browser';
 import * as Linking from 'expo-linking';
+import * as AppleAuthentication from 'expo-apple-authentication';
 
 const AuthContext = createContext({});
 
@@ -143,8 +144,28 @@ export function AuthProvider({ children }) {
 
   const signInWithGoogle = () => signInWithOAuth('google');
 
+  const signInWithApple = async () => {
+    const credential = await AppleAuthentication.signInAsync({
+      requestedScopes: [
+        AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+        AppleAuthentication.AppleAuthenticationScope.EMAIL,
+      ],
+    });
+
+    if (!credential.identityToken) {
+      throw new Error('Apple Sign In failed. Please try again.');
+    }
+
+    const { error } = await supabase.auth.signInWithIdToken({
+      provider: 'apple',
+      token: credential.identityToken,
+    });
+
+    if (error) throw error;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, session, loading, isPasswordRecovery, clearPasswordRecovery, handleDeepLink, signUp, signIn, signOut, resetPassword, updatePassword, deleteAccount, signInWithGoogle }}>
+    <AuthContext.Provider value={{ user, session, loading, isPasswordRecovery, clearPasswordRecovery, handleDeepLink, signUp, signIn, signOut, resetPassword, updatePassword, deleteAccount, signInWithGoogle, signInWithApple }}>
       {children}
     </AuthContext.Provider>
   );

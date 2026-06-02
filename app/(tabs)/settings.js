@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, Switch, ScrollView, StyleSheet, Alert, Pressable, Platform } from 'react-native';
+import { View, Text, Switch, ScrollView, StyleSheet, Alert, Pressable, Platform, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
@@ -64,6 +64,16 @@ export default function SettingsScreen() {
       { text: 'Cancel', style: 'cancel' },
       { text: 'Sign Out', style: 'destructive', onPress: () => signOut() },
     ]);
+  };
+
+  const handleContactUs = async () => {
+    const url = 'mailto:contact@kkanoxo.resend.app';
+    const supported = await Linking.canOpenURL(url);
+    if (supported) {
+      Linking.openURL(url);
+    } else {
+      Alert.alert('Contact Us', 'Reach us at contact@kkanoxo.resend.app');
+    }
   };
 
   const handleDeleteAccount = () => {
@@ -195,12 +205,22 @@ export default function SettingsScreen() {
                 <Text style={styles.legalLabel}>Terms of Service</Text>
                 <Ionicons name="chevron-forward" size={16} color={colors.textLabel} />
               </Pressable>
+
+              <View style={styles.divider} />
+
+              <Pressable style={styles.legalRow} onPress={handleContactUs}>
+                <View style={styles.iconSquare}>
+                  <Ionicons name="mail-outline" size={20} color={colors.textLabel} />
+                </View>
+                <Text style={styles.legalLabel}>Contact Us</Text>
+                <Ionicons name="chevron-forward" size={16} color={colors.textLabel} />
+              </Pressable>
             </View>
           </View>
         </View>
 
         <Pressable onPress={handleSignOut} style={styles.signOut}>
-          <Ionicons name="log-out-outline" size={18} color={colors.dangerAlt} />
+          <Ionicons name="log-out-outline" size={18} color={colors.danger} />
           <Text style={styles.signOutText}>Sign Out</Text>
         </Pressable>
 
@@ -349,13 +369,14 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   signOutText: {
-    color: colors.dangerAlt,
+    color: colors.danger,
     fontSize: typography.sizes.md,
     fontWeight: typography.weights.semibold,
   },
   deleteAccount: {
     marginTop: spacing.sm,
     paddingBottom: 20,
+    marginBottom: spacing.xl,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

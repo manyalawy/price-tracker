@@ -17,7 +17,8 @@
       "bundleIdentifier": "com.manyalawy.dipp",
       "infoPlist": {
         "NSUserNotificationUsageDescription": "Dipp sends you alerts when your tracked product prices drop.",
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "LSApplicationQueriesSchemes": ["mailto"]
       }
     },
     "android": {

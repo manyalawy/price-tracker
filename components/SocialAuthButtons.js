@@ -1,8 +1,18 @@
-import { View, Text, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
+import { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, ActivityIndicator, StyleSheet, Platform } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
+import * as AppleAuthentication from 'expo-apple-authentication';
 import { colors, spacing, typography, borderRadius } from '../constants/theme';
 
-export default function SocialAuthButtons({ onGoogle, loadingProvider = null }) {
+export default function SocialAuthButtons({ onGoogle, onApple, loadingProvider = null }) {
+  const [appleAvailable, setAppleAvailable] = useState(false);
+
+  useEffect(() => {
+    if (Platform.OS === 'ios') {
+      AppleAuthentication.isAvailableAsync().then(setAppleAvailable);
+    }
+  }, []);
+
   return (
     <View>
       <View style={styles.dividerRow}>
@@ -26,6 +36,16 @@ export default function SocialAuthButtons({ onGoogle, loadingProvider = null }) 
           </>
         )}
       </TouchableOpacity>
+
+      {appleAvailable && (
+        <AppleAuthentication.AppleAuthenticationButton
+          buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+          buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.WHITE}
+          cornerRadius={borderRadius.md}
+          style={[styles.appleButton, loadingProvider !== null && styles.appleButtonDisabled]}
+          onPress={onApple}
+        />
+      )}
     </View>
   );
 }
@@ -63,5 +83,13 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontSize: typography.sizes.sm,
     fontWeight: typography.weights.medium,
+  },
+  appleButton: {
+    width: '100%',
+    height: 44,
+    marginBottom: spacing.sm,
+  },
+  appleButtonDisabled: {
+    opacity: 0.5,
   },
 });

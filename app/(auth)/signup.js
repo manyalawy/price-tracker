@@ -9,7 +9,7 @@ import SocialAuthButtons from '../../components/SocialAuthButtons';
 import { parseError } from '../../lib/errorHandler';
 
 export default function SignUpScreen() {
-  const { signUp, signInWithGoogle } = useAuth();
+  const { signUp, signInWithGoogle, signInWithApple } = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -53,6 +53,18 @@ export default function SignUpScreen() {
     try {
       await signInWithGoogle();
     } catch (e) {
+      Alert.alert('Sign Up Failed', parseError(e));
+    } finally {
+      setSocialLoadingProvider(null);
+    }
+  };
+
+  const handleApple = async () => {
+    setSocialLoadingProvider('apple');
+    try {
+      await signInWithApple();
+    } catch (e) {
+      if (e.code === 'ERR_REQUEST_CANCELED') return;
       Alert.alert('Sign Up Failed', parseError(e));
     } finally {
       setSocialLoadingProvider(null);
@@ -134,6 +146,7 @@ export default function SignUpScreen() {
 
           <SocialAuthButtons
             onGoogle={handleGoogle}
+            onApple={handleApple}
             loadingProvider={socialLoadingProvider}
           />
 

@@ -133,6 +133,7 @@ export default function SettingsScreen() {
           <View>
             <Text style={styles.sectionLabel}>NOTIFICATIONS</Text>
             <View style={styles.notifGroup}>
+              {false && (
               <View style={[styles.notifRow, styles.notifRowGap]}>
                 <View style={styles.rowLeft}>
                   <Text style={styles.rowLabel}>Email Alerts</Text>
@@ -146,6 +147,7 @@ export default function SettingsScreen() {
                   ios_backgroundColor={colors.border}
                 />
               </View>
+              )}
               <View style={styles.notifRow}>
                 <View style={styles.rowLeft}>
                   <Text style={styles.rowLabel}>Push Notifications</Text>

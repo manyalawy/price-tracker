@@ -13,7 +13,7 @@ import AnimatedSplash from '../components/AnimatedSplash';
 SplashScreen.preventAutoHideAsync();
 
 function RootLayoutNav() {
-  const { user, session, loading, isPasswordRecovery, handleDeepLink } = useAuth();
+  const { user, session, loading, isPasswordRecovery, isEmailConfirmation, handleDeepLink } = useAuth();
   const router = useRouter();
   const notifListenerRef = useRef(null);
 
@@ -44,7 +44,7 @@ function RootLayoutNav() {
   return (
     <>
       <StatusBar style="light" />
-      {!session && !isPasswordRecovery && <Redirect href="/(auth)/login" />}
+      {!session && !isPasswordRecovery && !isEmailConfirmation && <Redirect href="/(auth)/login" />}
       <Stack
         screenOptions={{
           headerShown: false,

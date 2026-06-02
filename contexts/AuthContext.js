@@ -9,7 +9,14 @@ const AuthContext = createContext({});
 function isRecoveryUrl(url) {
   if (!url) return false;
   const parsed = Linking.parse(url);
-  return !!parsed.queryParams?.code || url.includes('#access_token=');
+  const hasToken = !!parsed.queryParams?.code || url.includes('#access_token=');
+  return hasToken && (parsed.path ?? '').includes('update-password');
+}
+
+function isEmailConfirmUrl(url) {
+  if (!url) return false;
+  const parsed = Linking.parse(url);
+  return !!parsed.queryParams?.code && (parsed.path ?? '').includes('email-confirm');
 }
 
 export function AuthProvider({ children }) {
@@ -17,6 +24,7 @@ export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
+  const [isEmailConfirmation, setIsEmailConfirmation] = useState(false);
 
   useEffect(() => {
     const init = async () => {
@@ -30,6 +38,8 @@ export function AuthProvider({ children }) {
 
         if (isRecoveryUrl(initialUrl)) {
           setIsPasswordRecovery(true);
+        } else if (isEmailConfirmUrl(initialUrl)) {
+          setIsEmailConfirmation(true);
         }
 
         setSession(initialSession);
@@ -55,7 +65,11 @@ export function AuthProvider({ children }) {
   }, []);
 
   const signUp = async (email, password) => {
-    const result = await supabase.auth.signUp({ email, password });
+    const result = await supabase.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo: Linking.createURL('email-confirm') },
+    });
     return result;
   };
 
@@ -110,15 +124,21 @@ export function AuthProvider({ children }) {
     throw new Error('Unable to complete sign-in. Please try again.');
   }, []);
 
-  // Handles a foreground deep link: guards against non-recovery URLs, sets state,
+  const clearEmailConfirmation = useCallback(() => setIsEmailConfirmation(false), []);
+
+  // Handles a foreground deep link: guards against unknown URLs, sets state,
   // and exchanges the token. Called from _layout.js via Linking.addEventListener.
   const handleDeepLink = useCallback(async (url) => {
-    if (!isRecoveryUrl(url)) return;
-    setIsPasswordRecovery(true);
-    try {
-      await createSessionFromUrl(url);
-    } catch {
-      setIsPasswordRecovery(false);
+    if (isRecoveryUrl(url)) {
+      setIsPasswordRecovery(true);
+      try {
+        await createSessionFromUrl(url);
+      } catch {
+        setIsPasswordRecovery(false);
+      }
+    } else if (isEmailConfirmUrl(url)) {
+      setIsEmailConfirmation(true);
+      // Expo Router navigates to the email-confirm screen, which does the exchange
     }
   }, [createSessionFromUrl]);
 
@@ -165,7 +185,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, isPasswordRecovery, clearPasswordRecovery, handleDeepLink, signUp, signIn, signOut, resetPassword, updatePassword, deleteAccount, signInWithGoogle, signInWithApple }}>
+    <AuthContext.Provider value={{ user, session, loading, isPasswordRecovery, clearPasswordRecovery, isEmailConfirmation, clearEmailConfirmation, handleDeepLink, signUp, signIn, signOut, resetPassword, updatePassword, deleteAccount, signInWithGoogle, signInWithApple }}>
       {children}
     </AuthContext.Provider>
   );

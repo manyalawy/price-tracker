@@ -68,7 +68,7 @@ export default function HomeScreen() {
       </View>
 
       {/* Search */}
-      <SearchBar value={search} onChangeText={setSearch} />
+      {user && <SearchBar value={search} onChangeText={setSearch} />}
 
       {/* Section label */}
       {filtered.length > 0 && (

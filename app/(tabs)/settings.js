@@ -7,6 +7,7 @@ import { supabase } from '../../lib/supabase';
 import { colors, spacing, typography, borderRadius } from '../../constants/theme';
 import { parseError } from '../../lib/errorHandler';
 import AppHeader from "../../components/ui/AppHeader";
+import Button from '../../components/ui/Button';
 
 export default function SettingsScreen() {
   const { user, signOut, deleteAccount } = useAuth();
@@ -123,56 +124,72 @@ export default function SettingsScreen() {
         <Text style={styles.title}>Settings</Text>
 
         <View style={styles.sections}>
-          {/* ACCOUNT */}
-          <View>
-            <Text style={styles.sectionLabel}>ACCOUNT</Text>
-            <View style={styles.card}>
-              <View style={styles.accountRow}>
-                <View style={styles.iconCircle}>
-                  <Ionicons name="at-circle" size={20} color={colors.accent} />
-                </View>
-                <View style={styles.accountText}>
-                  <Text style={styles.accountEmailLabel}>EMAIL ADDRESS</Text>
-                  <Text style={styles.accountEmail}>{user?.email}</Text>
-                </View>
+          {!user && (
+            <View>
+              <Text style={styles.sectionLabel}>ACCOUNT</Text>
+              <View style={styles.card}>
+                <Text style={styles.guestPrompt}>
+                  Sign in to manage your account, notifications, and tracked products.
+                </Text>
+                <Button title="Sign In" onPress={() => router.push('/(auth)/login')} />
               </View>
             </View>
-          </View>
+          )}
 
-          {/* NOTIFICATIONS */}
-          <View>
-            <Text style={styles.sectionLabel}>NOTIFICATIONS</Text>
-            <View style={styles.notifGroup}>
-              {false && (
-              <View style={[styles.notifRow, styles.notifRowGap]}>
-                <View style={styles.rowLeft}>
-                  <Text style={styles.rowLabel}>Email Alerts</Text>
-                  <Text style={styles.rowDesc}>Get price drop alerts via email</Text>
+          {user && (
+            <>
+              {/* ACCOUNT */}
+              <View>
+                <Text style={styles.sectionLabel}>ACCOUNT</Text>
+                <View style={styles.card}>
+                  <View style={styles.accountRow}>
+                    <View style={styles.iconCircle}>
+                      <Ionicons name="at-circle" size={20} color={colors.accent} />
+                    </View>
+                    <View style={styles.accountText}>
+                      <Text style={styles.accountEmailLabel}>EMAIL ADDRESS</Text>
+                      <Text style={styles.accountEmail}>{user?.email}</Text>
+                    </View>
+                  </View>
                 </View>
-                <Switch
-                  value={emailNotifs}
-                  onValueChange={toggleEmailNotifs}
-                  trackColor={{ false: colors.border, true: colors.accentGradientEnd }}
-                  thumbColor={emailNotifs ? colors.accentThumb : colors.text}
-                  ios_backgroundColor={colors.border}
-                />
               </View>
-              )}
-              <View style={styles.notifRow}>
-                <View style={styles.rowLeft}>
-                  <Text style={styles.rowLabel}>Push Notifications</Text>
-                  <Text style={styles.rowDesc}>Get price drop alerts on your device</Text>
+
+              {/* NOTIFICATIONS */}
+              <View>
+                <Text style={styles.sectionLabel}>NOTIFICATIONS</Text>
+                <View style={styles.notifGroup}>
+                  {false && (
+                  <View style={[styles.notifRow, styles.notifRowGap]}>
+                    <View style={styles.rowLeft}>
+                      <Text style={styles.rowLabel}>Email Alerts</Text>
+                      <Text style={styles.rowDesc}>Get price drop alerts via email</Text>
+                    </View>
+                    <Switch
+                      value={emailNotifs}
+                      onValueChange={toggleEmailNotifs}
+                      trackColor={{ false: colors.border, true: colors.accentGradientEnd }}
+                      thumbColor={emailNotifs ? colors.accentThumb : colors.text}
+                      ios_backgroundColor={colors.border}
+                    />
+                  </View>
+                  )}
+                  <View style={styles.notifRow}>
+                    <View style={styles.rowLeft}>
+                      <Text style={styles.rowLabel}>Push Notifications</Text>
+                      <Text style={styles.rowDesc}>Get price drop alerts on your device</Text>
+                    </View>
+                    <Switch
+                      value={pushNotifs}
+                      onValueChange={togglePushNotifs}
+                      trackColor={{ false: colors.border, true: colors.accentGradientEnd }}
+                      thumbColor={pushNotifs ? colors.accentThumb : colors.text}
+                      ios_backgroundColor={colors.border}
+                    />
+                  </View>
                 </View>
-                <Switch
-                  value={pushNotifs}
-                  onValueChange={togglePushNotifs}
-                  trackColor={{ false: colors.border, true: colors.accentGradientEnd }}
-                  thumbColor={pushNotifs ? colors.accentThumb : colors.text}
-                  ios_backgroundColor={colors.border}
-                />
               </View>
-            </View>
-          </View>
+            </>
+          )}
 
           {/* ABOUT */}
           <View>
@@ -219,21 +236,25 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        <Pressable onPress={handleSignOut} style={styles.signOut}>
-          <Ionicons name="log-out-outline" size={18} color={colors.danger} />
-          <Text style={styles.signOutText}>Sign Out</Text>
-        </Pressable>
+        {user && (
+          <>
+            <Pressable onPress={handleSignOut} style={styles.signOut}>
+              <Ionicons name="log-out-outline" size={18} color={colors.danger} />
+              <Text style={styles.signOutText}>Sign Out</Text>
+            </Pressable>
 
-        <Pressable
-          onPress={handleDeleteAccount}
-          disabled={deleting}
-          style={styles.deleteAccount}
-        >
-          <Ionicons name="trash-outline" size={16} color={colors.danger} />
-          <Text style={styles.deleteAccountText}>
-            {deleting ? 'Deleting…' : 'Delete Account'}
-          </Text>
-        </Pressable>
+            <Pressable
+              onPress={handleDeleteAccount}
+              disabled={deleting}
+              style={styles.deleteAccount}
+            >
+              <Ionicons name="trash-outline" size={16} color={colors.danger} />
+              <Text style={styles.deleteAccountText}>
+                {deleting ? 'Deleting…' : 'Delete Account'}
+              </Text>
+            </Pressable>
+          </>
+        )}
       </ScrollView>
     </View>
   );
@@ -274,6 +295,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.cardAlt,
     borderRadius: borderRadius.xl,
     padding: spacing.lg,
+  },
+  guestPrompt: {
+    color: colors.textLabel,
+    fontSize: typography.sizes.sm,
+    lineHeight: 20,
+    marginBottom: spacing.lg,
   },
   accountRow: {
     flexDirection: 'row',

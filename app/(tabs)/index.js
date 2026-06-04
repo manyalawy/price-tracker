@@ -49,7 +49,9 @@ export default function HomeScreen() {
       <View style={styles.heroSection}>
         <View style={styles.greetingGroup}>
           <Text style={styles.greetingLine}>{greetingBase}</Text>
-          <Text style={styles.subtitle}>You're tracking {activeProducts.length} products.</Text>
+          <Text style={styles.subtitle}>
+            {user ? `You're tracking ${activeProducts.length} products.` : 'Welcome to Dipp.'}
+          </Text>
         </View>
 
         {products.length > 0 && (
@@ -75,23 +77,38 @@ export default function HomeScreen() {
     </View>
   );
 
-  const ListEmpty = loading && products.length === 0 ? (
-    <View style={{ gap: spacing.lg, opacity: 0.4 }}>
-      <Text style={styles.sectionLabel}>SYNCING LATEST…</Text>
-      <View style={{ gap: spacing.lg }}>
-        <View style={{ backgroundColor: colors.groupBg, height: 192, borderRadius: borderRadius.xl }} />
-        <View style={{ backgroundColor: colors.groupBg, height: 192, borderRadius: borderRadius.xl }} />
+  let ListEmpty;
+  if (!user) {
+    ListEmpty = (
+      <EmptyState
+        iconName="sparkles-outline"
+        title="Track prices for free"
+        message="Paste a product link to see its price now. Sign in to save it and get alerts when the price drops."
+        actionLabel="Sign In"
+        onAction={() => router.push('/(auth)/login')}
+      />
+    );
+  } else if (loading && products.length === 0) {
+    ListEmpty = (
+      <View style={{ gap: spacing.lg, opacity: 0.4 }}>
+        <Text style={styles.sectionLabel}>SYNCING LATEST…</Text>
+        <View style={{ gap: spacing.lg }}>
+          <View style={{ backgroundColor: colors.groupBg, height: 192, borderRadius: borderRadius.xl }} />
+          <View style={{ backgroundColor: colors.groupBg, height: 192, borderRadius: borderRadius.xl }} />
+        </View>
       </View>
-    </View>
-  ) : (
-    <EmptyState
-      iconName="archive-outline"
-      title="Nothing tracked yet"
-      message="Start adding links to monitor prices and get notified on drops."
-      actionLabel="Add your first product"
-      onAction={() => router.push('/(tabs)/add')}
-    />
-  );
+    );
+  } else {
+    ListEmpty = (
+      <EmptyState
+        iconName="archive-outline"
+        title="Nothing tracked yet"
+        message="Start adding links to monitor prices and get notified on drops."
+        actionLabel="Add your first product"
+        onAction={() => router.push('/(tabs)/add')}
+      />
+    );
+  }
 
   return (
     <View style={styles.container}>

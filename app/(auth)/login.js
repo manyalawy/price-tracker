@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { View, Text, Image, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Alert } from 'react-native';
-import { Link } from 'expo-router';
+import { View, Text, Image, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Alert, Pressable } from 'react-native';
+import { Link, useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../contexts/AuthContext';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
@@ -10,6 +12,16 @@ import { parseError } from '../../lib/errorHandler';
 
 export default function LoginScreen() {
   const { signIn, signInWithGoogle, signInWithApple } = useAuth();
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
+
+  const handleClose = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)/');
+    }
+  };
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -61,6 +73,13 @@ export default function LoginScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
+      <Pressable
+        onPress={handleClose}
+        style={[styles.closeButton, { top: insets.top + spacing.sm }]}
+        hitSlop={spacing.sm}
+      >
+        <Ionicons name="close" size={26} color={colors.textSecondary} />
+      </Pressable>
       <ScrollView
         contentContainerStyle={styles.inner}
         keyboardShouldPersistTaps="handled"
@@ -118,6 +137,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  closeButton: {
+    position: 'absolute',
+    left: spacing.lg,
+    zIndex: 10,
   },
   inner: {
     flexGrow: 1,

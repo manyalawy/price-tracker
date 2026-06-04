@@ -8,6 +8,7 @@ import ProductPreview from '../../components/ProductPreview';
 import ReportURLModal from '../../components/ReportURLModal';
 import { extractProduct } from '../../lib/api';
 import { useProducts } from '../../contexts/ProductsContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { parseError } from '../../lib/errorHandler';
 import { colors, spacing, typography, borderRadius } from '../../constants/theme';
 import { MAX_PRODUCTS } from '../../constants/config';
@@ -17,6 +18,7 @@ import Input from '../../components/ui/Input';
 export default function AddScreen() {
   const router = useRouter();
   const { addProduct, products } = useProducts();
+  const { user } = useAuth();
   const [url, setUrl] = useState('');
   const [productName, setProductName] = useState('');
   const [extracting, setExtracting] = useState(false);
@@ -55,6 +57,17 @@ export default function AddScreen() {
   };
 
   const handleTrack = async () => {
+    if (!user) {
+      Alert.alert(
+        'Sign in to track',
+        'Create a free account to save this product and get price-drop alerts.',
+        [
+          { text: 'Not now', style: 'cancel' },
+          { text: 'Sign In', onPress: () => router.push('/(auth)/login') },
+        ]
+      );
+      return;
+    }
     if (products.length >= MAX_PRODUCTS) {
       setError(`You've reached the ${MAX_PRODUCTS}-product limit. Remove a product to add a new one.`);
       return;

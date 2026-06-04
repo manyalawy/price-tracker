@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Redirect, Stack, useRouter } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import * as Linking from 'expo-linking';
@@ -13,7 +13,7 @@ import AnimatedSplash from '../components/AnimatedSplash';
 SplashScreen.preventAutoHideAsync();
 
 function RootLayoutNav() {
-  const { user, session, loading, isPasswordRecovery, isEmailConfirmation, handleDeepLink } = useAuth();
+  const { user, loading, handleDeepLink } = useAuth();
   const router = useRouter();
   const notifListenerRef = useRef(null);
 
@@ -44,7 +44,6 @@ function RootLayoutNav() {
   return (
     <>
       <StatusBar style="light" />
-      {!session && !isPasswordRecovery && !isEmailConfirmation && <Redirect href="/(auth)/login" />}
       <Stack
         screenOptions={{
           headerShown: false,

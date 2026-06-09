@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { View, Text, Switch, ScrollView, StyleSheet, Alert, Pressable, Platform, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
@@ -17,9 +17,13 @@ export default function SettingsScreen() {
   const [deleting, setDeleting] = useState(false);
   const [emailNotifs, setEmailNotifs] = useState(true);
   const [pushNotifs, setPushNotifs] = useState(true);
-  useEffect(() => {
-    loadProfile();
-  }, [user]);
+  // Re-fetch the latest notification settings every time the screen gains
+  // focus, so navigating back never shows stale cached values.
+  useFocusEffect(
+    useCallback(() => {
+      loadProfile();
+    }, [user])
+  );
 
   const loadProfile = async () => {
     if (!user) return;

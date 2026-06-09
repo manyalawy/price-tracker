@@ -6,6 +6,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { colors, spacing, typography, borderRadius } from '../../constants/theme';
 import { parseError } from '../../lib/errorHandler';
+import { registerForPushNotifications } from '../../lib/notifications';
 import AppHeader from "../../components/ui/AppHeader";
 import Button from '../../components/ui/Button';
 
@@ -57,6 +58,22 @@ export default function SettingsScreen() {
     if (error) {
       setPushNotifs(!value);
       Alert.alert('Error', parseError(error));
+      return;
+    }
+    // When enabling, (re)fetch and save the Expo token. registerForPushNotifications
+    // is idempotent and won't re-prompt if permission is already granted.
+    if (value) {
+      const token = await registerForPushNotifications(user.id);
+      if (!token) {
+        Alert.alert(
+          'Enable notifications',
+          'Allow notifications for Dipp in your device settings to receive push alerts.',
+          [
+            { text: 'Not now', style: 'cancel' },
+            { text: 'Open Settings', onPress: () => Linking.openSettings() },
+          ]
+        );
+      }
     }
   };
 
@@ -158,7 +175,6 @@ export default function SettingsScreen() {
               <View>
                 <Text style={styles.sectionLabel}>NOTIFICATIONS</Text>
                 <View style={styles.notifGroup}>
-                  {false && (
                   <View style={[styles.notifRow, styles.notifRowGap]}>
                     <View style={styles.rowLeft}>
                       <Text style={styles.rowLabel}>Email Alerts</Text>
@@ -172,7 +188,6 @@ export default function SettingsScreen() {
                       ios_backgroundColor={colors.border}
                     />
                   </View>
-                  )}
                   <View style={styles.notifRow}>
                     <View style={styles.rowLeft}>
                       <Text style={styles.rowLabel}>Push Notifications</Text>

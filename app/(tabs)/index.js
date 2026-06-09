@@ -98,6 +98,14 @@ export default function HomeScreen() {
         </View>
       </View>
     );
+  } else if (search && filtered.length === 0) {
+    ListEmpty = (
+      <EmptyState
+        iconName="search-outline"
+        title="No products found"
+        message={`No tracked products match "${search}".`}
+      />
+    );
   } else {
     ListEmpty = (
       <EmptyState

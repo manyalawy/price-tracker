@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { View, Text, Switch, ScrollView, StyleSheet, Alert, Pressable, Platform, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import Constants from 'expo-constants';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { colors, spacing, typography, borderRadius } from '../../constants/theme';
@@ -215,7 +216,7 @@ export default function SettingsScreen() {
                   <Ionicons name="information-circle" size={20} color={colors.textLabel} />
                 </View>
                 <Text style={styles.versionLabel}>Version</Text>
-                <Text style={styles.versionValue}>Dipp v1.0.0</Text>
+                <Text style={styles.versionValue}>Dipp v1.0.1</Text>
               </View>
 
               <View style={styles.divider} />

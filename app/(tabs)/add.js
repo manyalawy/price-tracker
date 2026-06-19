@@ -27,6 +27,8 @@ export default function AddScreen() {
   const [error, setError] = useState('');
   const [extractFailed, setExtractFailed] = useState(false);
   const [reportModalVisible, setReportModalVisible] = useState(false);
+  const [notificationMode, setNotificationMode] = useState('any_drop');
+  const [targetPrice, setTargetPrice] = useState('');
 
   const handleExtract = async () => {
     if (!url.trim()) {
@@ -72,6 +74,18 @@ export default function AddScreen() {
       setError(`You've reached the ${MAX_PRODUCTS}-product limit. Remove a product to add a new one.`);
       return;
     }
+    if (notificationMode === 'target_price') {
+      const parsed = parseFloat(targetPrice);
+      if (!parsed || parsed <= 0) {
+        setError('Please enter a valid target price');
+        return;
+      }
+      if (parsed >= product.price) {
+        setError('Target price must be lower than the current price');
+        return;
+      }
+    }
+
     setSaving(true);
     setError('');
 
@@ -85,12 +99,15 @@ export default function AddScreen() {
         currency: product.currency,
         method: product.method,
         selector: product.selector,
+        target_price: notificationMode === 'target_price' ? parseFloat(targetPrice) : null,
       });
       Alert.alert('Success', 'Product is now being tracked!', [
         { text: 'OK', onPress: () => {
           setUrl('');
           setProduct(null);
           setProductName('');
+          setNotificationMode('any_drop');
+          setTargetPrice('');
           router.push('/(tabs)');
         }},
       ]);
@@ -172,6 +189,78 @@ export default function AddScreen() {
                 onChangeText={setProductName}
                 placeholder="Enter product name"
               />
+
+              <View style={styles.alertSection}>
+                <Text style={styles.alertLabel}>HOW SHOULD WE ALERT YOU?</Text>
+
+                <TouchableOpacity
+                  style={[styles.alertCard, notificationMode === 'any_drop' && styles.alertCardSelected]}
+                  onPress={() => setNotificationMode('any_drop')}
+                  activeOpacity={0.8}
+                >
+                  <View style={styles.alertCardRow}>
+                    <Ionicons
+                      name="notifications-outline"
+                      size={20}
+                      color={notificationMode === 'any_drop' ? colors.accent : colors.textMuted}
+                    />
+                    <View style={styles.alertCardText}>
+                      <Text style={[styles.alertCardTitle, notificationMode === 'any_drop' && styles.alertCardTitleSelected]}>
+                        Any price drop
+                      </Text>
+                      <Text style={styles.alertCardDesc}>
+                        Notify me whenever the price drops below what it is today.
+                      </Text>
+                    </View>
+                    <Ionicons
+                      name={notificationMode === 'any_drop' ? 'radio-button-on-outline' : 'radio-button-off-outline'}
+                      size={20}
+                      color={notificationMode === 'any_drop' ? colors.accent : colors.textMuted}
+                    />
+                  </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[styles.alertCard, notificationMode === 'target_price' && styles.alertCardSelected]}
+                  onPress={() => setNotificationMode('target_price')}
+                  activeOpacity={0.8}
+                >
+                  <View style={styles.alertCardRow}>
+                    <Ionicons
+                      name="pricetag-outline"
+                      size={20}
+                      color={notificationMode === 'target_price' ? colors.accent : colors.textMuted}
+                    />
+                    <View style={styles.alertCardText}>
+                      <Text style={[styles.alertCardTitle, notificationMode === 'target_price' && styles.alertCardTitleSelected]}>
+                        Target price
+                      </Text>
+                      <Text style={styles.alertCardDesc}>
+                        Only alert me when the price hits a number I choose.
+                      </Text>
+                    </View>
+                    <Ionicons
+                      name={notificationMode === 'target_price' ? 'radio-button-on-outline' : 'radio-button-off-outline'}
+                      size={20}
+                      color={notificationMode === 'target_price' ? colors.accent : colors.textMuted}
+                    />
+                  </View>
+                  {notificationMode === 'target_price' && (
+                    <View style={styles.targetInputRow}>
+                      <Text style={styles.targetCurrency}>{product.currency || 'USD'}</Text>
+                      <TextInput
+                        style={styles.targetInput}
+                        value={targetPrice}
+                        onChangeText={(t) => { setTargetPrice(t); setError(''); }}
+                        placeholder="0.00"
+                        placeholderTextColor={colors.textMuted}
+                        keyboardType="decimal-pad"
+                        autoFocus
+                      />
+                    </View>
+                  )}
+                </TouchableOpacity>
+              </View>
 
               <View style={styles.trackSection}>
                 <TouchableOpacity onPress={handleTrack} disabled={trackDisabled} activeOpacity={0.85}>
@@ -308,6 +397,69 @@ const styles = StyleSheet.create({
     borderTopColor: 'rgba(72,71,74,0.1)',
     paddingTop: 17,
     gap: spacing.xl,
+  },
+  alertSection: {
+    gap: spacing.sm,
+  },
+  alertLabel: {
+    color: colors.textMuted,
+    fontSize: typography.sizes.xs,
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+    marginBottom: spacing.xs,
+  },
+  alertCard: {
+    backgroundColor: colors.cardAlt,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  alertCardSelected: {
+    backgroundColor: colors.accent + '20',
+    borderColor: colors.accent,
+  },
+  alertCardRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.sm,
+  },
+  alertCardText: {
+    flex: 1,
+    gap: 3,
+  },
+  alertCardTitle: {
+    color: colors.textSecondary,
+    fontSize: typography.sizes.sm,
+    fontWeight: typography.weights.medium,
+  },
+  alertCardTitleSelected: {
+    color: colors.text,
+  },
+  alertCardDesc: {
+    color: colors.textMuted,
+    fontSize: typography.sizes.xs,
+    lineHeight: 16,
+  },
+  targetInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.inputBg,
+    borderRadius: borderRadius.sm,
+    paddingHorizontal: spacing.md,
+    marginTop: spacing.sm,
+  },
+  targetCurrency: {
+    color: colors.textSecondary,
+    fontSize: typography.sizes.md,
+    marginRight: spacing.xs,
+  },
+  targetInput: {
+    flex: 1,
+    color: colors.text,
+    fontSize: typography.sizes.md,
+    fontWeight: typography.weights.semibold,
+    paddingVertical: spacing.sm,
   },
   trackSection: {
     gap: spacing.sm,

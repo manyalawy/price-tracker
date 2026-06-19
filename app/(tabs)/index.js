@@ -6,6 +6,7 @@ import { useProducts } from '../../contexts/ProductsContext';
 import ProductCard from '../../components/ProductCard';
 import SearchBar from '../../components/SearchBar';
 import EmptyState from '../../components/ui/EmptyState';
+import SkeletonLoader from '../../components/ui/SkeletonLoader';
 import { colors, spacing, typography, borderRadius } from '../../constants/theme';
 import { useRouter } from 'expo-router';
 
@@ -90,11 +91,12 @@ export default function HomeScreen() {
     );
   } else if (loading && products.length === 0) {
     ListEmpty = (
-      <View style={{ gap: spacing.lg, opacity: 0.4 }}>
+      <View style={{ gap: spacing.lg }}>
         <Text style={styles.sectionLabel}>SYNCING LATEST…</Text>
         <View style={{ gap: spacing.lg }}>
-          <View style={{ backgroundColor: colors.groupBg, height: 192, borderRadius: borderRadius.xl }} />
-          <View style={{ backgroundColor: colors.groupBg, height: 192, borderRadius: borderRadius.xl }} />
+          <SkeletonLoader height={120} style={{ borderRadius: borderRadius.xl }} />
+          <SkeletonLoader height={120} style={{ borderRadius: borderRadius.xl }} />
+          <SkeletonLoader height={120} style={{ borderRadius: borderRadius.xl }} />
         </View>
       </View>
     );

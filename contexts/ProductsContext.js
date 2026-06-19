@@ -69,7 +69,7 @@ export function ProductsProvider({ children }) {
         domain: productData.domain,
         current_price: productData.price,
         original_price: productData.price,
-        target_price: null,
+        target_price: productData.target_price ?? null,
         currency: productData.currency || 'USD',
         highest_price: productData.price,
         lowest_price: productData.price,
@@ -112,7 +112,7 @@ export function ProductsProvider({ children }) {
   }
 
   return (
-    <ProductsContext.Provider value={{ ...state, fetchProducts, addProduct, deleteProduct }}>
+    <ProductsContext.Provider value={{ ...state, fetchProducts, addProduct, deleteProduct, dispatch }}>
       {children}
     </ProductsContext.Provider>
   );

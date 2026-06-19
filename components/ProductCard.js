@@ -63,6 +63,18 @@ export default function ProductCard({ product }) {
             </Text>
             <Text style={[styles.currencyLabel, isStopped && styles.mutedText]}>{product.currency}</Text>
           </View>
+          {isPriceDrop && (() => {
+            const savings = product.original_price - product.current_price;
+            const pct = Math.round((savings / product.original_price) * 100);
+            return (
+              <View style={styles.deltaRow}>
+                <Text style={styles.deltaAmount}>↓ {savings.toFixed(2)} saved</Text>
+                <Text style={styles.deltaSep}> · </Text>
+                <Text style={styles.deltaPct}>-{pct}%</Text>
+                <Text style={styles.deltaOriginal}>  was {product.original_price.toFixed(2)}</Text>
+              </View>
+            );
+          })()}
         </View>
       </View>
     </Pressable>
@@ -162,5 +174,29 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     marginLeft: spacing.xs,
     marginBottom: 4,
+  },
+  deltaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: spacing.xs,
+  },
+  deltaAmount: {
+    color: colors.accent,
+    fontSize: typography.sizes.xs,
+    fontWeight: typography.weights.medium,
+  },
+  deltaSep: {
+    color: colors.textMuted,
+    fontSize: typography.sizes.xs,
+  },
+  deltaPct: {
+    color: colors.textSecondary,
+    fontSize: typography.sizes.xs,
+    fontWeight: typography.weights.medium,
+  },
+  deltaOriginal: {
+    color: colors.textMuted,
+    fontSize: typography.sizes.xs,
+    textDecorationLine: 'line-through',
   },
 });

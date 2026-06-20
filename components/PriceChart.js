@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, Pressable, StyleSheet, Dimensions } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { colors, spacing, typography, borderRadius } from '../constants/theme';
@@ -14,6 +14,15 @@ const TIME_RANGES = [
 
 export default function PriceChart({ chartData, selectedRange, onRangeChange }) {
   const hasData = chartData?.datasets?.[0]?.data?.length > 1;
+  const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0, index: -1 });
+
+  useEffect(() => {
+    setTooltip({ visible: false, x: 0, y: 0, index: -1 });
+  }, [chartData]);
+
+  const handleRangeChange = (days) => {
+    onRangeChange(days);
+  };
 
   return (
     <View style={styles.container}>
@@ -21,7 +30,7 @@ export default function PriceChart({ chartData, selectedRange, onRangeChange }) 
         {TIME_RANGES.map(r => (
           <Pressable
             key={r.label}
-            onPress={() => onRangeChange(r.days)}
+            onPress={() => handleRangeChange(r.days)}
             style={[styles.rangeButton, selectedRange === r.days && styles.rangeActive]}
           >
             <Text style={[styles.rangeText, selectedRange === r.days && styles.rangeTextActive]}>
@@ -44,7 +53,7 @@ export default function PriceChart({ chartData, selectedRange, onRangeChange }) 
             color: (opacity = 1) => `rgba(74, 222, 128, ${opacity})`,
             labelColor: (opacity = 1) => `rgba(156, 163, 175, ${opacity})`,
             propsForDots: {
-              r: '3',
+              r: '5',
               strokeWidth: '1',
               stroke: colors.accent,
             },
@@ -57,9 +66,32 @@ export default function PriceChart({ chartData, selectedRange, onRangeChange }) 
           style={styles.chart}
           withInnerLines={true}
           withOuterLines={false}
-          withVerticalLabels={true}
+          withVerticalLabels={false}
           withHorizontalLabels={true}
           fromZero={false}
+          onDataPointClick={({ x, y, index }) => {
+            setTooltip(prev =>
+              prev.visible && prev.index === index
+                ? { visible: false, x: 0, y: 0, index: -1 }
+                : { visible: true, x, y, index }
+            );
+          }}
+          decorator={() => {
+            if (!tooltip.visible) return null;
+            const label = chartData.labels[tooltip.index];
+            const price = chartData.datasets[0].data[tooltip.index];
+            const tipWidth = 90;
+            const left = Math.min(
+              Math.max(tooltip.x - tipWidth / 2, 0),
+              screenWidth - tipWidth
+            );
+            return (
+              <View style={[styles.tooltip, { left, top: tooltip.y - 52 }]}>
+                <Text style={styles.tooltipDate}>{label}</Text>
+                <Text style={styles.tooltipPrice}>{price?.toFixed(2)}</Text>
+              </View>
+            );
+          }}
         />
       ) : (
         <View style={styles.noData}>
@@ -109,5 +141,23 @@ const styles = StyleSheet.create({
   noDataText: {
     color: colors.textMuted,
     fontSize: typography.sizes.md,
+  },
+  tooltip: {
+    position: 'absolute',
+    backgroundColor: colors.cardAlt,
+    borderRadius: borderRadius.sm,
+    paddingVertical: 4,
+    paddingHorizontal: spacing.sm,
+    alignItems: 'center',
+    width: 90,
+  },
+  tooltipDate: {
+    color: colors.textSecondary,
+    fontSize: typography.sizes.xs,
+  },
+  tooltipPrice: {
+    color: colors.accent,
+    fontSize: typography.sizes.sm,
+    fontWeight: typography.weights.semibold,
   },
 });

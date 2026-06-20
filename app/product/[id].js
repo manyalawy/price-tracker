@@ -25,7 +25,7 @@ export default function ProductDetailScreen() {
     if (!id) return;
     try {
       const history = await fetchPriceHistory(id, selectedRange);
-      setChartData(formatChartData(history));
+      setChartData(formatChartData(history, selectedRange));
     } catch (err) {
       setChartData(null);
     }
